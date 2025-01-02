@@ -1,32 +1,31 @@
-version: "3.8"
-
 services:
   postgres:
-    image: postgis/postgis:15-3.3
+    build:
+      context: ./postgres
     container_name: geoapp_postgres
-    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: geoapp
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro # Mount the SQL file
+    ports:
+      - "5432:5432"
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
     container_name: geoapp_backend
-    restart: always
     environment:
-      DATABASE_URL: postgres://postgres:secret@postgres:5432/geoapp
-    ports:
-      - "8000:8000"
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: geoapp
     depends_on:
       - postgres
+    ports:
+      - "8000:8000"
 
 volumes:
   postgres_data:
