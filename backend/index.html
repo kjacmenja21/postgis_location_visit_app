@@ -15,29 +15,150 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <style>
-      #map {
-        height: 600px;
-        width: 100%;
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
       }
-      .leaflet-control-geocoder {
-        margin-bottom: 10px;
+
+      #map {
+        height: 100%;
+        width: 75%; /* Adjusted to make room for the sidebar */
+        float: left;
+      }
+
+      /* Sidebar styling */
+      #sidebar {
+        width: 25%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        box-sizing: border-box;
+        float: left;
+        overflow-y: auto;
+        border-left: 2px solid #ccc;
+      }
+
+      #sidebar h2 {
+        font-size: 24px;
+        margin-top: 0;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        font-weight: bold;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+        margin-top: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        height: 100px;
+      }
+
+      #resetButton,
+      #saveButton {
+        width: 100%;
+        padding: 10px;
+        background-color: #4285f4;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      #resetButton:hover,
+      #saveButton:hover {
+        background-color: #357ae8;
+      }
+
+      .leaflet-control-geocoder input {
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 14px;
+        box-shadow: none;
+        width: 250px;
+        transition: all 0.3s ease;
+      }
+
+      .leaflet-control-geocoder input:focus {
+        border-color: #4285f4;
+        outline: none;
+      }
+
+      .leaflet-marker-icon {
+        border-radius: 50%;
+        border: 3px solid #4285f4;
+        background-color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .leaflet-popup-content {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+      }
+
+      .leaflet-popup-content b {
+        color: #4285f4;
+      }
+
+      .leaflet-popup-content {
+        max-width: 200px;
       }
     </style>
   </head>
   <body>
-    <h1>Geographic Application</h1>
+    <!-- Sidebar for controls -->
+    <div id="sidebar">
+      <h2>Manage Markers</h2>
+      <div class="form-group">
+        <label for="markerName">Name</label>
+        <input type="text" id="markerName" placeholder="Enter marker name" />
+      </div>
+      <div class="form-group">
+        <label for="markerDescription">Description</label>
+        <textarea
+          id="markerDescription"
+          placeholder="Enter description"
+        ></textarea>
+      </div>
+      <button id="saveButton">Save Marker</button>
+      <button id="resetButton">Reset Map</button>
+    </div>
+
+    <!-- Map Container -->
     <div id="map"></div>
+
     <script>
-      // Initialize map
+      // Initialize the map centered on a specific location
       var map = L.map("map").setView([45.815, 15.981], 10); // Centered on Zagreb
+
+      // Add OpenStreetMap layer
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      // Add geocoder (search bar)
+      // Add Geocoder control for searching
       var geocoder = L.Control.geocoder({
         defaultMarkGeocode: false,
+        collapsed: true,
+        placeholder: "Search for a location...",
       })
         .on("markgeocode", function (e) {
           var bbox = e.geocode.bbox;
@@ -63,51 +184,61 @@
         })
         .catch((error) => console.error("Error loading locations:", error));
 
-      // Add marker on map click
+      // Add new marker functionality on map click
       map.on("click", function (e) {
         var latlng = e.latlng;
-        var popupContent = `
-                <form id="addMarkerForm">
-                    <label>Naziv: <input type="text" id="naziv" required /></label><br />
-                    <label>Opis: <textarea id="opis"></textarea></label><br />
-                    <button type="submit">Add Marker</button>
-                </form>
-            `;
-        var popup = L.popup()
-          .setLatLng(latlng)
-          .setContent(popupContent)
-          .openOn(map);
 
-        // Handle form submission
-        document.getElementById("addMarkerForm").onsubmit = function (event) {
-          event.preventDefault();
-          var naziv = document.getElementById("naziv").value;
-          var opis = document.getElementById("opis").value;
+        // Automatically populate the form with the clicked location
+        document.getElementById("markerName").value = "";
+        document.getElementById("markerDescription").value = "";
 
-          // Save marker to the backend
-          fetch("/api/add_marker", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              naziv: naziv,
-              opis: opis,
-              lat: latlng.lat,
-              lon: latlng.lng,
-            }),
-          })
-            .then((response) => {
-              if (response.ok) {
-                L.marker([latlng.lat, latlng.lng])
-                  .addTo(map)
-                  .bindPopup(`<b>${naziv}</b><br>${opis}`);
-                map.closePopup();
-              } else {
-                alert("Failed to add marker.");
-              }
+        // Handle marker saving
+        document.getElementById("saveButton").onclick = function () {
+          var name = document.getElementById("markerName").value;
+          var description = document.getElementById("markerDescription").value;
+
+          if (name && description) {
+            // Save marker to the backend
+            fetch("/api/add_marker", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                naziv: name,
+                opis: description,
+                lat: latlng.lat,
+                lon: latlng.lng,
+              }),
             })
-            .catch((error) => console.error("Error adding marker:", error));
+              .then((response) => {
+                if (response.ok) {
+                  L.marker([latlng.lat, latlng.lng])
+                    .addTo(map)
+                    .bindPopup(`<b>${name}</b><br>${description}`);
+                  alert("Marker added successfully!");
+                } else {
+                  alert("Failed to add marker.");
+                }
+              })
+              .catch((error) => console.error("Error adding marker:", error));
+          } else {
+            alert("Please fill in both fields.");
+          }
         };
       });
+
+      // Reset map functionality
+      document.getElementById("resetButton").onclick = function () {
+        map.setView([45.815, 15.981], 10); // Reset to initial position
+      };
+
+      // Get user location and center map
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          var userLat = position.coords.latitude;
+          var userLon = position.coords.longitude;
+          map.setView([userLat, userLon], 13);
+        });
+      }
     </script>
   </body>
 </html>
