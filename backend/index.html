@@ -120,6 +120,20 @@
       .leaflet-popup-content {
         max-width: 200px;
       }
+
+      /* Custom user icon for person's marker */
+      .user-marker {
+        background-color: #4285f4;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        line-height: 30px;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        border: 2px solid #fff;
+      }
     </style>
   </head>
   <body>
@@ -231,12 +245,27 @@
         map.setView([45.815, 15.981], 10); // Reset to initial position
       };
 
-      // Get user location and center map
+      // Get user location and center map with a "person" marker
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
           var userLat = position.coords.latitude;
           var userLon = position.coords.longitude;
+
+          // Center the map on the user's location
           map.setView([userLat, userLon], 13);
+
+          // Create a custom "person" marker icon
+          var personIcon = L.divIcon({
+            className: "user-marker",
+            html: "P", // The 'P' represents a person, you can replace this with any symbol/image
+            iconSize: [30, 30], // Custom size for the person icon
+            iconAnchor: [15, 15], // Anchor the icon at its center
+          });
+
+          // Add the person marker at the user's location
+          L.marker([userLat, userLon], { icon: personIcon })
+            .addTo(map)
+            .bindPopup("<b>You are here!</b>");
         });
       }
     </script>
