@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geographic Application</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  </head>
+  <body>
+    <h1>Visited Locations</h1>
+    <div id="map" style="height: 600px; width: 100%"></div>
+    <script>
+      var map = L.map("map").setView([45.815, 15.981], 10); // Centered on Zagreb
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          'Map data \u00a9 <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Fetch locations from the API
+      fetch("/api/lokacije")
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((loc) => {
+            L.marker([loc.lat, loc.lon])
+              .addTo(map)
+              .bindPopup(`<b>${loc.naziv}</b><br>${loc.opis}`);
+          });
+        })
+        .catch((error) => console.error("Error loading locations:", error));
+    </script>
+  </body>
+</html>
