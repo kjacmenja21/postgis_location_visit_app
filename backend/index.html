@@ -8,19 +8,50 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+    />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <style>
+      #map {
+        height: 600px;
+        width: 100%;
+      }
+      .leaflet-control-geocoder {
+        margin-bottom: 10px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Visited Locations</h1>
-    <div id="map" style="height: 600px; width: 100%"></div>
+    <h1>Geographic Application</h1>
+    <div id="map"></div>
     <script>
+      // Initialize map
       var map = L.map("map").setView([45.815, 15.981], 10); // Centered on Zagreb
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
-          'Map data \u00a9 <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+          'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      // Fetch locations from the API
+      // Add geocoder (search bar)
+      var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+      })
+        .on("markgeocode", function (e) {
+          var bbox = e.geocode.bbox;
+          var poly = L.polygon([
+            [bbox.getSouthWest().lat, bbox.getSouthWest().lng],
+            [bbox.getSouthWest().lat, bbox.getNorthEast().lng],
+            [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
+            [bbox.getNorthEast().lat, bbox.getSouthWest().lng],
+          ]).addTo(map);
+          map.fitBounds(poly.getBounds());
+        })
+        .addTo(map);
+
+      // Fetch existing locations and display them
       fetch("/api/lokacije")
         .then((response) => response.json())
         .then((data) => {
@@ -31,6 +62,52 @@
           });
         })
         .catch((error) => console.error("Error loading locations:", error));
+
+      // Add marker on map click
+      map.on("click", function (e) {
+        var latlng = e.latlng;
+        var popupContent = `
+                <form id="addMarkerForm">
+                    <label>Naziv: <input type="text" id="naziv" required /></label><br />
+                    <label>Opis: <textarea id="opis"></textarea></label><br />
+                    <button type="submit">Add Marker</button>
+                </form>
+            `;
+        var popup = L.popup()
+          .setLatLng(latlng)
+          .setContent(popupContent)
+          .openOn(map);
+
+        // Handle form submission
+        document.getElementById("addMarkerForm").onsubmit = function (event) {
+          event.preventDefault();
+          var naziv = document.getElementById("naziv").value;
+          var opis = document.getElementById("opis").value;
+
+          // Save marker to the backend
+          fetch("/api/add_marker", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              naziv: naziv,
+              opis: opis,
+              lat: latlng.lat,
+              lon: latlng.lng,
+            }),
+          })
+            .then((response) => {
+              if (response.ok) {
+                L.marker([latlng.lat, latlng.lng])
+                  .addTo(map)
+                  .bindPopup(`<b>${naziv}</b><br>${opis}`);
+                map.closePopup();
+              } else {
+                alert("Failed to add marker.");
+              }
+            })
+            .catch((error) => console.error("Error adding marker:", error));
+        };
+      });
     </script>
   </body>
 </html>
