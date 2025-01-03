@@ -1,0 +1,119 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+#map {
+  height: 100%;
+  width: 75%; /* Adjusted to make room for the sidebar */
+  float: left;
+}
+
+/* Sidebar styling */
+#sidebar {
+  width: 25%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  box-sizing: border-box;
+  float: left;
+  overflow-y: auto;
+  border-left: 2px solid #ccc;
+}
+
+#sidebar h2 {
+  font-size: 24px;
+  margin-top: 0;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.form-group textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+#resetButton,
+#saveButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #4285f4;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#resetButton:hover,
+#saveButton:hover {
+  background-color: #357ae8;
+}
+
+.leaflet-control-geocoder input {
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-size: 14px;
+  box-shadow: none;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.leaflet-control-geocoder input:focus {
+  border-color: #4285f4;
+  outline: none;
+}
+
+.leaflet-marker-icon {
+  border-radius: 50%;
+  border: 3px solid #4285f4;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-content {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.leaflet-popup-content b {
+  color: #4285f4;
+}
+
+.leaflet-popup-content {
+  max-width: 200px;
+}
+
+/* Custom user icon for person's marker */
+.user-marker {
+  background-color: #4285f4;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: 2px solid #fff;
+}
