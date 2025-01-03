@@ -4,6 +4,7 @@ import psycopg2
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -19,10 +20,14 @@ app.add_middleware(
 # Connect to PostgreSQL database
 conn = psycopg2.connect("dbname=geoapp user=postgres password=secret host=postgres")
 
+# Mount the directory containing index.html and index.js
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend() -> HTMLResponse:
-    with open("index.html", "r", encoding="utf-8") as file:
+    # Serve the main HTML file from the static directory
+    with open("static/index.html", "r", encoding="utf-8") as file:
         html_content = file.read()
     return HTMLResponse(content=html_content)
 
@@ -37,7 +42,7 @@ async def get_lokacije() -> list[dict[str, Any]]:
 
 
 @app.post("/api/add_marker")
-async def add_marker(request: Request):
+async def add_marker(request: Request) -> dict[str, str]:
     data = await request.json()
     naziv = data.get("naziv")
     opis = data.get("opis")
