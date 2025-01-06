@@ -1,6 +1,8 @@
 // Initialize the map centered on a specific location
 var map = L.map("map").setView([45.815, 15.981], 10); // Centered on Zagreb
 
+map.doubleClickZoom.disable();
+
 // Add OpenStreetMap layer
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
@@ -41,55 +43,57 @@ fetch("/api/lokacije")
 let isDragging = false;
 let tempMarker = null;
 
+map.on("dblclick", (e) => {
+  if (!tempMarker) {
+    tempMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+  }
+  // Automatically populate the form with the clicked location
+  document.getElementById("markerName").value = "";
+  document.getElementById("markerDescription").value = "";
+});
+
 map.on("mousedown", (e) => {
   isDragging = true;
-  tempMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
 });
 
 map.on("mouseup", (e) => {
   if (isDragging) {
     isDragging = false;
-
-    // Automatically populate the form with the clicked location
-    document.getElementById("markerName").value = "";
-    document.getElementById("markerDescription").value = "";
-
-    // Handle marker saving
-    document.getElementById("saveButton").onclick = function () {
-      var name = document.getElementById("markerName").value;
-      var description = document.getElementById("markerDescription").value;
-
-      if (name && description) {
-        // Save marker to the backend
-        fetch("/api/add_marker", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            naziv: name,
-            opis: description,
-            lat: tempMarker.getLatLng().lat,
-            lon: tempMarker.getLatLng().lng,
-          }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              tempMarker
-                .bindPopup(`<b>${name}</b><br>${description}`)
-                .openPopup();
-              alert("Marker added successfully!");
-            } else {
-              alert("Failed to add marker.");
-              tempMarker.remove();
-            }
-          })
-          .catch((error) => console.error("Error adding marker:", error));
-      } else {
-        alert("Please fill in both fields.");
-        tempMarker.remove();
-      }
-    };
   }
 });
+
+// Handle marker saving
+document.getElementById("saveButton").onclick = function () {
+  var name = document.getElementById("markerName").value;
+  var description = document.getElementById("markerDescription").value;
+
+  if (name && description) {
+    // Save marker to the backend
+    fetch("/api/add_marker", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        naziv: name,
+        opis: description,
+        lat: tempMarker.getLatLng().lat,
+        lon: tempMarker.getLatLng().lng,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          tempMarker.bindPopup(`<b>${name}</b><br>${description}`).openPopup();
+          alert("Marker added successfully!");
+        } else {
+          alert("Failed to add marker.");
+          tempMarker.remove();
+        }
+      })
+      .catch((error) => console.error("Error adding marker:", error));
+  } else {
+    alert("Please fill in both fields.");
+    tempMarker.remove();
+  }
+};
 
 // Reset map functionality
 document.getElementById("resetButton").onclick = function () {

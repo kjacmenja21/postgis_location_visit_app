@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Any
 
 import psycopg2
@@ -18,7 +19,7 @@ app.add_middleware(
 )
 
 # Connect to PostgreSQL database
-conn = psycopg2.connect("dbname=geoapp user=postgres password=secret host=postgres")
+conn = psycopg2.connect("dbname=postgres user=user password=password host=postgres")
 
 # Mount the directory containing index.html and index.js
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -73,4 +74,5 @@ async def add_marker(request: Request) -> dict[str, str]:
 if __name__ == "__main__":
     import uvicorn
 
+    sleep(5)
     uvicorn.run(app, host="0.0.0.0", port=8000)
