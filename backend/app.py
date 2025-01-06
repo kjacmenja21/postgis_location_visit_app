@@ -1,3 +1,4 @@
+import os
 from time import sleep
 from typing import Any
 
@@ -19,7 +20,13 @@ app.add_middleware(
 )
 
 # Connect to PostgreSQL database
-conn = psycopg2.connect("dbname=postgres user=user password=password host=postgres")
+conn = psycopg2.connect(
+    dbname=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
+    port=os.getenv("DB_PORT"),
+)
 
 # Mount the directory containing index.html and index.js
 app.mount("/static", StaticFiles(directory="static"), name="static")
