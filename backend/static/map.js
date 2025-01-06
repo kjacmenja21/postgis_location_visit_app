@@ -44,9 +44,11 @@ let isDragging = false;
 let tempMarker = null;
 
 map.on("dblclick", (e) => {
+  const { lat, lng } = e.latlng;
   if (!tempMarker) {
-    tempMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+    tempMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
   }
+  tempMarker.setLatLng([lat, lng]);
   // Automatically populate the form with the clicked location
   document.getElementById("markerName").value = "";
   document.getElementById("markerDescription").value = "";
