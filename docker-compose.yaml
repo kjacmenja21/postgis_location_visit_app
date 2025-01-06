@@ -1,21 +1,27 @@
 services:
   postgres:
+    image: postgis/postgis:latest
     build:
-      context: ./postgres
+      context: postgres/
+      dockerfile: Dockerfile
     container_name: geoapp_postgres
+    restart: always
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: geoapp
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
 
   backend:
     build:
-      context: ./backend
+      context: backend/
+      dockerfile: Dockerfile
     container_name: geoapp_backend
+    restart: always
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
