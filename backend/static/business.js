@@ -77,7 +77,7 @@ document.getElementById("resetButton").onclick = function () {
 };
 
 document.getElementById("drawPolygonsButton").onclick = async function () {
-  let distance = document.getElementById("distance").value.trim();
+  let distance = document.getElementById("polygonDistance").value.trim();
   // Check if the distance ends with 'km', if so, convert to meters
   if (distance.toLowerCase().endsWith("km")) {
     // Remove 'km' and multiply by 1000 to convert to meters
@@ -128,6 +128,48 @@ document.getElementById("drawPolygonsButton").onclick = async function () {
     alert("Failed to draw polygons. Check the console for details.");
   }
 };
+
+// Event listener for the heatmap button
+document.getElementById("heatmapButton").addEventListener("click", function () {
+  // Get the value from the input field
+  let distance = document.getElementById("heatmapDistance").value.trim();
+  // Check if the distance ends with 'km', if so, convert to meters
+  if (distance.toLowerCase().endsWith("km")) {
+    // Remove 'km' and multiply by 1000 to convert to meters
+    distance = parseFloat(distance.slice(0, -2)) * 1000;
+  } else {
+    // If it doesn't end with 'km', treat it as meters
+    distance = parseFloat(distance);
+  }
+  if (!distance || isNaN(distance) || distance <= 0) {
+    alert("Please enter a valid distance.");
+    return;
+  }
+
+  // Fetch the heatmap data from the API
+  fetch(`/api/heatmap_data?distance=${distance}`)
+    .then((response) => response.json())
+    .then((data) => {
+      // Clear any existing heatmap layers before adding a new one
+      if (window.heatmapLayer) {
+        map.removeLayer(window.heatmapLayer);
+      }
+
+      // Create an array of points for the heatmap (format: [lat, lon, intensity])
+      var heatmapData = data.features.map((point) => [
+        point.lat,
+        point.lon,
+        point.intensity,
+      ]);
+
+      // Add the heatmap layer to the map
+      window.heatmapLayer = L.heatLayer(heatmapData, {
+        radius: 25,
+        blur: 15,
+      }).addTo(map);
+    })
+    .catch((error) => console.error("Error fetching heatmap data:", error));
+});
 
 // Get user location and center map with a "person" marker
 if (navigator.geolocation) {
