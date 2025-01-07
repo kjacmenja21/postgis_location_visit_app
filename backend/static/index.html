@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Geographic Application</title>
+    <title>TrackVista</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -13,8 +13,8 @@
       href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
     />
     <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css"
     />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -23,29 +23,46 @@
   <body>
     <div id="layout">
       <div id="sidebar">
-        <h2>Manage Markers</h2>
-        <div class="form-group">
-          <label for="markerName">Name</label>
-          <input type="text" id="markerName" placeholder="Enter marker name" />
-        </div>
-        <div class="form-group">
-          <label for="markerDescription">Description</label>
-          <textarea
-            id="markerDescription"
-            placeholder="Enter description"
-          ></textarea>
-        </div>
-        <div class="form-group">
-          <label for="markerDate">Date Visited</label>
-          <input type="date" id="markerDate" />
-        </div>
-        <button id="saveButton">Save Marker</button>
+        <h1>TrackVista</h1>
+
         <button id="resetButton">Reset Map</button>
+
+        <h2>Manage Markers</h2>
+
+        <button class="collapsible">Add Marker</button>
+        <div class="content">
+          <div class="form-group">
+            <label for="markerName">Name</label>
+            <input
+              type="text"
+              id="markerName"
+              placeholder="Enter marker name"
+            />
+            <label for="markerDescription">Description</label>
+            <textarea
+              id="markerDescription"
+              placeholder="Enter description"
+            ></textarea
+            ><label for="markerDate">Date Visited</label>
+            <input type="date" id="markerDate" />
+            <button id="saveButton">Save Marker</button>
+          </div>
+        </div>
+
+        <button class="collapsible">Remove Marker</button>
+        <div class="content">Test</div>
+
+        <h2>Visualize</h2>
+
+        <button class="collapsible">Polygons</button>
+        <div class="content">Test</div>
       </div>
+
       <div id="main">
         <div id="map"></div>
       </div>
     </div>
     <script src="/static/map.js"></script>
+    <script src="/static/collapsible.js"></script>
   </body>
 </html>

@@ -6,10 +6,22 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* Page title styling (h1) */
+#sidebar h1 {
+  font-family: "Roboto", sans-serif; /* Professional, modern sans-serif font */
+  font-size: 36px; /* Larger font size for page title */
+  font-weight: bold; /* Make it a bit lighter to keep it elegant */
+  text-align: center; /* Center align the title */
+  margin-top: 0; /* Remove top margin to place it at the very top */
+  margin-bottom: 20px; /* Space below the title */
+  color: #4285f4; /* Primary accent color for consistency */
+  letter-spacing: 2px; /* Add some space between letters for emphasis */
+}
+
 /* Layout container */
 #layout {
   display: flex;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
   flex-direction: row; /* Sidebar on the left, map on the right */
 }
 
@@ -25,11 +37,42 @@ body {
   border-right: 2px solid #ccc;
 }
 
+/* Section title styling */
 #sidebar h2 {
-  font-size: 24px;
-  margin-top: 0;
+  font-size: 28px; /* Increased font size for prominence */
+  font-weight: bold;
+  margin-top: 20px; /* Space above the title */
+  margin-bottom: 20px; /* Space below the title */
+  color: #333; /* Darker color for better contrast */
 }
 
+/* Style for collapsible buttons */
+.collapsible {
+  background-color: #4285f4;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.collapsible:hover {
+  background-color: #357ae8;
+}
+
+/* Content of collapsible sections, initially hidden */
+.content {
+  display: none;
+  padding: 0 18px;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
+/* Form group styling for inputs and textareas */
 .form-group {
   margin-bottom: 15px;
 }
