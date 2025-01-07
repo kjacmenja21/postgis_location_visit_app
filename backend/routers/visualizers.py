@@ -40,11 +40,11 @@ async def get_heatmap_data(
     distance: float,
     db: psycopg2.extensions.connection = Depends(get_db),
 ) -> dict[str, Any]:
-    """Fetch heatmap data within a defined distance"""
+    """Fetch heatmap data (clustered points with intensity)"""
     cur = db.cursor()
     try:
         # Call the PostgreSQL function to get heatmap data
-        cur.execute("SELECT get_heatmap_data(%s);", (distance,))
+        cur.execute("SELECT generate_heatmap_data(%s);", (distance,))
         rows = cur.fetchall()
     except Exception as e:
         raise HTTPException(
@@ -53,8 +53,7 @@ async def get_heatmap_data(
     finally:
         cur.close()
 
-    # Assuming the result is in the form of a JSONB object
-    heatmap_data = rows[0][0] if rows else []
+    # Extract the heatmap data from the result (which is in JSON format)
+    heatmap_data = rows[0][0]  # Get the JSONB result from the query
 
-    # Return the heatmap data as a GeoJSON-like response
     return {"type": "FeatureCollection", "features": heatmap_data}
