@@ -79,8 +79,9 @@ map.on("mouseup", (e) => {
   }
 });
 
-function markersFromLatLon() {
-  return (data) => {
+fetch("/api/lokacije")
+  .then((response) => response.json())
+  .then((data) => {
     allMarkers = data.map((loc) => {
       const marker = L.marker([loc.lat, loc.lon])
         .addTo(map)
@@ -91,6 +92,5 @@ function markersFromLatLon() {
         );
       return { marker, date: loc.datum_posjeta };
     });
-  };
-}
-fetchLocations();
+  })
+  .catch((error) => console.error("Error loading locations:", error));
