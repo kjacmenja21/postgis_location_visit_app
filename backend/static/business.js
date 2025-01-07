@@ -35,20 +35,34 @@ document.getElementById("saveButton").onclick = function () {
   }
 };
 
+// Handle marker deletion
 document.getElementById("deleteButton").onclick = function () {
   var name = document.getElementById("deleteName").value;
   if (name) {
-    fetch("/api/add_marker", {
-      method: "POST",
+    fetch("/api/remove_marker", {
+      method: "DELETE", // Correct HTTP method for deletion
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        naziv: name,
-        opis: description,
-        lat: tempMarker.getLatLng().lat,
-        lon: tempMarker.getLatLng().lng,
-        datum_posjeta: date || null, // Pass date if provided
+        naziv: name, // Pass the marker name to delete
       }),
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete marker: " + response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Display success message or handle response
+        alert(data.message || "Marker deleted successfully!");
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error("Error:", error);
+        alert("Error deleting marker: " + error.message);
+      });
+  } else {
+    alert("Please enter a marker name to delete.");
   }
 };
 
