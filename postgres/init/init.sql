@@ -61,3 +61,22 @@ BEGIN
     VALUES (naziv, opis, ST_SetSRID(ST_MakePoint(lon, lat), 4326), datum_posjeta);
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_nearby_polygons(
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION,
+    distance DOUBLE PRECISION
+) RETURNS JSONB AS $$
+BEGIN
+    RETURN (
+        SELECT jsonb_agg(ST_AsGeoJSON(p.geometrija)::jsonb)
+        FROM lokacije p
+        WHERE ST_DWithin(
+            p.geometrija,
+            ST_SetSRID(ST_MakePoint(lon, lat), 4326),
+            distance
+        )
+    );
+END;
+$$ LANGUAGE plpgsql;
+
