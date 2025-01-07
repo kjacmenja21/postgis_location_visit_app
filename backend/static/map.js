@@ -1,3 +1,15 @@
+const redIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+let allMarkers = []; // Store all markers for filtering
 // Initialize the map centered on a specific location
 var map = L.map("map").setView([45.815, 15.981], 10); // Centered on Zagreb
 
@@ -27,14 +39,18 @@ var geocoder = L.Control.geocoder({
   })
   .addTo(map);
 
-// Fetch existing locations and display them
 fetch("/api/lokacije")
   .then((response) => response.json())
   .then((data) => {
-    data.forEach((loc) => {
-      L.marker([loc.lat, loc.lon])
+    allMarkers = data.map((loc) => {
+      const marker = L.marker([loc.lat, loc.lon])
         .addTo(map)
-        .bindPopup(`<b>${loc.naziv}</b><br>${loc.opis}`);
+        .bindPopup(
+          `<b>${loc.naziv}</b><br>${loc.opis}<br>${
+            loc.datum_posjeta || "No date"
+          }`
+        );
+      return { marker, date: loc.datum_posjeta };
     });
   })
   .catch((error) => console.error("Error loading locations:", error));
@@ -46,7 +62,9 @@ let tempMarker = null;
 map.on("dblclick", (e) => {
   const { lat, lng } = e.latlng;
   if (!tempMarker) {
-    tempMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    tempMarker = L.marker([lat, lng], { draggable: true, icon: redIcon }).addTo(
+      map
+    );
   }
   tempMarker.setLatLng([lat, lng]);
 });
