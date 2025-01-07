@@ -100,7 +100,7 @@ BEGIN
     FROM lokacije
     WHERE ST_DWithin(
         geometrija,
-        ST_SetSRID(ST_MakePoint(NEW.lon, NEW.lat), 4326),
+        NEW.geometrija, -- Use NEW.geometrija directly
         0.00001 -- Approximation for 1 meter in degrees
     );
 
