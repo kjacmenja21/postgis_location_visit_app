@@ -69,7 +69,10 @@ CREATE OR REPLACE FUNCTION get_nearby_polygons(
 ) RETURNS JSONB AS $$
 BEGIN
     RETURN (
-        SELECT jsonb_agg(ST_AsGeoJSON(p.geometrija)::jsonb)
+        SELECT jsonb_build_object(
+            'polygon', ST_AsGeoJSON(ST_ConvexHull(ST_Collect(p.geometrija)))::jsonb,
+            'points', jsonb_agg(ST_AsGeoJSON(p.geometrija)::jsonb)
+        )
         FROM lokacije p
         WHERE ST_DWithin(
             p.geometrija,
@@ -79,6 +82,7 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION prevent_duplicate_markers()
 RETURNS TRIGGER AS $$
