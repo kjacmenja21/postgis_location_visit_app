@@ -3,7 +3,7 @@
 -- Helper function to generate random date between 2014 and 2025
 CREATE OR REPLACE FUNCTION random_date() RETURNS DATE AS $$
 BEGIN
-    RETURN (CURRENT_DATE - (FLOOR(RANDOM() * (365 * (2025 - 2014)) + 365 * (2014 - EXTRACT(YEAR FROM CURRENT_DATE)::INT))))::DATE;
+    RETURN CURRENT_DATE - (FLOOR(RANDOM() * (365 * (2025 - 2014)))) * INTERVAL '1 day';
 END;
 $$ LANGUAGE plpgsql;
 
