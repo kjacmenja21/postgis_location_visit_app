@@ -43,10 +43,20 @@ async def serve_frontend() -> HTMLResponse:
 @app.get("/api/lokacije")
 async def get_lokacije() -> list[dict[str, Any]]:
     cur = conn.cursor()
-    cur.execute("SELECT * FROM get_lokacije();")
-    rows = cur.fetchall()
-    cur.close()
-    return [{"naziv": r[0], "lon": r[1], "lat": r[2], "opis": r[3]} for r in rows]
+    try:
+        # Call the database function
+        cur.execute("SELECT * FROM get_lokacije();")
+        rows = cur.fetchall()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch locations") from e
+    finally:
+        cur.close()
+
+    # Map rows to dictionary format
+    return [
+        {"naziv": r[0], "lon": r[1], "lat": r[2], "opis": r[3], "datum_posjeta": r[4]}
+        for r in rows
+    ]
 
 
 @app.post("/api/add_marker")
