@@ -67,7 +67,13 @@ CREATE OR REPLACE FUNCTION get_nearby_polygons(
     lon DOUBLE PRECISION,
     distance DOUBLE PRECISION
 ) RETURNS JSONB AS $$
+DECLARE
+    point_geometria geometry;
 BEGIN
+    -- Convert the input point to a projected coordinate system (e.g., EPSG:3857)
+    point_geometria := ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4326), 3857);
+    
+    -- Return the polygons and points within the specified distance
     RETURN (
         SELECT jsonb_build_object(
             'polygon', ST_AsGeoJSON(ST_ConvexHull(ST_Collect(p.geometrija)))::jsonb,
@@ -75,9 +81,9 @@ BEGIN
         )
         FROM lokacije p
         WHERE ST_DWithin(
-            p.geometrija,
-            ST_SetSRID(ST_MakePoint(lon, lat), 4326),
-            distance
+            ST_Transform(p.geometrija, 3857), -- Transform stored point to EPSG:3857
+            point_geometria,
+            distance -- distance in meters
         )
     );
 END;
