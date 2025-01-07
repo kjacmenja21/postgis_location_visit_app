@@ -28,6 +28,7 @@ document.getElementById("saveButton").onclick = function () {
           tempMarker.remove();
         }
       })
+      .then(() => refreshMarkers(map))
       .catch((error) => console.error("Error adding marker:", error));
   } else {
     alert("Please fill in all fields.");
@@ -56,6 +57,7 @@ document.getElementById("deleteButton").onclick = function () {
         // Display success message or handle response
         alert(data.message || "Marker deleted successfully!");
       })
+      .then(() => refreshMarkers(map))
       .catch((error) => {
         // Handle errors
         console.error("Error:", error);
