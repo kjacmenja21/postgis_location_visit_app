@@ -116,3 +116,14 @@ CREATE TRIGGER prevent_duplicate_marker_trigger
 BEFORE INSERT ON lokacije
 FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_markers();
+
+CREATE OR REPLACE FUNCTION remove_marker_by_name(marker_name TEXT)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM lokacije
+    WHERE naziv = marker_name;
+
+    -- Optional: Notify user of success
+    RAISE NOTICE 'Marker with name "%" has been removed.', marker_name;
+END;
+$$ LANGUAGE plpgsql;
