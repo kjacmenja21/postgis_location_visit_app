@@ -10,12 +10,23 @@ CREATE TABLE lokacije (
     datum_posjeta DATE DEFAULT CURRENT_DATE
 );
 
--- Function to get locations
+-- Function to get locations with visit date
 CREATE OR REPLACE FUNCTION get_lokacije()
-RETURNS TABLE (naziv VARCHAR, lon FLOAT, lat FLOAT, opis TEXT) AS $$
+RETURNS TABLE (
+    naziv VARCHAR,
+    lon FLOAT,
+    lat FLOAT,
+    opis TEXT,
+    datum_posjeta DATE
+) AS $$
 BEGIN
     RETURN QUERY
-    SELECT lokacije.naziv, ST_X(lokacije.geometrija)::FLOAT, ST_Y(lokacije.geometrija)::FLOAT, lokacije.opis
+    SELECT 
+        lokacije.naziv,
+        ST_X(lokacije.geometrija)::FLOAT AS lon,
+        ST_Y(lokacije.geometrija)::FLOAT AS lat,
+        lokacije.opis,
+        lokacije.datum_posjeta
     FROM lokacije;
 END;
 $$ LANGUAGE plpgsql;
