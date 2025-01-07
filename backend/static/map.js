@@ -49,9 +49,6 @@ map.on("dblclick", (e) => {
     tempMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
   }
   tempMarker.setLatLng([lat, lng]);
-  // Automatically populate the form with the clicked location
-  document.getElementById("markerName").value = "";
-  document.getElementById("markerDescription").value = "";
 });
 
 map.on("mousedown", (e) => {
@@ -68,6 +65,7 @@ map.on("mouseup", (e) => {
 document.getElementById("saveButton").onclick = function () {
   var name = document.getElementById("markerName").value;
   var description = document.getElementById("markerDescription").value;
+  var date = document.getElementById("markerDate").value;
 
   if (name && description) {
     // Save marker to the backend
@@ -79,11 +77,14 @@ document.getElementById("saveButton").onclick = function () {
         opis: description,
         lat: tempMarker.getLatLng().lat,
         lon: tempMarker.getLatLng().lng,
+        datum_posjeta: date || null, // Pass date if provided
       }),
     })
       .then((response) => {
         if (response.ok) {
-          tempMarker.bindPopup(`<b>${name}</b><br>${description}`).openPopup();
+          tempMarker
+            .bindPopup(`<b>${name}</b><br>${description}<br>${date}`)
+            .openPopup();
           alert("Marker added successfully!");
         } else {
           alert("Failed to add marker.");
@@ -92,7 +93,7 @@ document.getElementById("saveButton").onclick = function () {
       })
       .catch((error) => console.error("Error adding marker:", error));
   } else {
-    alert("Please fill in both fields.");
+    alert("Please fill in all fields.");
     tempMarker.remove();
   }
 };

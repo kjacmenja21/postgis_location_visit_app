@@ -56,6 +56,7 @@ async def add_marker(request: Request) -> dict[str, str]:
     opis = data.get("opis")
     lat = data.get("lat")
     lon = data.get("lon")
+    datum_posjeta = data.get("datum_posjeta")  # Optional
 
     # Validate input
     if (
@@ -67,7 +68,10 @@ async def add_marker(request: Request) -> dict[str, str]:
 
     cur = conn.cursor()
     try:
-        cur.execute("SELECT insert_marker(%s, %s, %s, %s)", (naziv, opis, lat, lon))
+        cur.execute(
+            "INSERT INTO lokacije (naziv, opis, geometrija, datum_posjeta) VALUES (%s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s)",
+            (naziv, opis, lon, lat, datum_posjeta),
+        )
         conn.commit()
     except Exception as e:
         conn.rollback()  # Rollback transaction on error
