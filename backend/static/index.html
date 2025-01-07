@@ -16,37 +16,35 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <div id="sidebar">
-      <h2>Manage Markers</h2>
-      <div class="form-group">
-        <label for="markerName">Name</label>
-        <input type="text" id="markerName" placeholder="Enter marker name" />
+    <div id="layout">
+      <div id="sidebar">
+        <h2>Manage Markers</h2>
+        <div class="form-group">
+          <label for="markerName">Name</label>
+          <input type="text" id="markerName" placeholder="Enter marker name" />
+        </div>
+        <div class="form-group">
+          <label for="markerDescription">Description</label>
+          <textarea
+            id="markerDescription"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="markerDate">Date Visited</label>
+          <input type="date" id="markerDate" />
+        </div>
+        <button id="saveButton">Save Marker</button>
+        <button id="resetButton">Reset Map</button>
       </div>
-      <div class="form-group">
-        <label for="markerDescription">Description</label>
-        <textarea
-          id="markerDescription"
-          placeholder="Enter description"
-        ></textarea>
+      <div id="main">
+        <div id="map"></div>
       </div>
-      <div class="form-group">
-        <label for="markerDate">Date Visited</label>
-        <input type="date" id="markerDate" />
-      </div>
-      <button id="saveButton">Save Marker</button>
-      <button id="resetButton">Reset Map</button>
-    </div>
-    <div id="map"></div>
-    <div id="timeline-container">
-      <label for="timeline">Filter by Date</label>
-      <div id="timeline"></div>
-      <span id="date-display"></span>
     </div>
     <script src="/static/map.js"></script>
   </body>

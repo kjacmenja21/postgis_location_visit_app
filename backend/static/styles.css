@@ -1,3 +1,4 @@
+/* Reset styles */
 html,
 body {
   height: 100%;
@@ -5,10 +6,11 @@ body {
   font-family: Arial, sans-serif;
 }
 
-#map {
-  height: 100%;
-  width: 75%; /* Adjusted to make room for the sidebar */
-  float: left;
+/* Layout container */
+#layout {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+  flex-direction: row; /* Sidebar on the left, map on the right */
 }
 
 /* Sidebar styling */
@@ -18,9 +20,8 @@ body {
   background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   box-sizing: border-box;
-  float: left;
   overflow-y: auto;
-  border-left: 2px solid #ccc;
+  border-right: 2px solid #ccc;
 }
 
 #sidebar h2 {
@@ -67,6 +68,20 @@ body {
 #resetButton:hover,
 #saveButton:hover {
   background-color: #357ae8;
+}
+
+/* Main content area */
+#main {
+  flex: 1; /* Take up remaining space */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Map styling */
+#map {
+  flex: 1; /* Fill available vertical space */
+  width: 100%;
 }
 
 .leaflet-control-geocoder input {
@@ -117,17 +132,4 @@ body {
   font-size: 18px;
   font-weight: bold;
   border: 2px solid #fff;
-}
-
-#timeline-container {
-  margin: 20px;
-  padding: 10px;
-  background-color: white;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}
-
-#timeline {
-  margin-top: 10px;
 }
