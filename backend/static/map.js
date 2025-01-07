@@ -79,18 +79,61 @@ map.on("mouseup", (e) => {
   }
 });
 
-fetch("/api/lokacije")
-  .then((response) => response.json())
-  .then((data) => {
-    allMarkers = data.map((loc) => {
-      const marker = L.marker([loc.lat, loc.lon])
-        .addTo(map)
-        .bindPopup(
-          `<b>${loc.naziv}</b><br>${loc.opis}<br>${
-            loc.datum_posjeta || "No date"
-          }`
-        );
-      return { marker, date: loc.datum_posjeta };
-    });
-  })
-  .catch((error) => console.error("Error loading locations:", error));
+// Function to refresh markers
+function refreshMarkers(map) {
+  fetch("/api/lokacije")
+    .then((response) => response.json())
+    .then((data) => {
+      // Create a Set of current marker coordinates for comparison
+      const currentCoords = new Set(
+        allMarkers.map(
+          (m) => `${m.marker.getLatLng().lat},${m.marker.getLatLng().lng}`
+        )
+      );
+
+      // Add new markers and update allMarkers list
+      const newMarkers = data
+        .map((loc) => {
+          const coordsKey = `${loc.lat},${loc.lon}`;
+
+          // If the marker is not already on the map, create it
+          if (!currentCoords.has(coordsKey)) {
+            const marker = L.marker([loc.lat, loc.lon])
+              .addTo(map)
+              .bindPopup(
+                `<b>${loc.naziv}</b><br>${loc.opis}<br>${
+                  loc.datum_posjeta || "No date"
+                }`
+              );
+            return { marker, date: loc.datum_posjeta };
+          }
+          return null;
+        })
+        .filter(Boolean); // Filter out nulls
+
+      // Remove markers that are no longer in the data
+      allMarkers.forEach(({ marker }) => {
+        const markerCoordsKey = `${marker.getLatLng().lat},${
+          marker.getLatLng().lng
+        }`;
+        if (!data.some((loc) => `${loc.lat},${loc.lon}` === markerCoordsKey)) {
+          map.removeLayer(marker); // Remove marker from the map
+        }
+      });
+
+      // Update the allMarkers array
+      allMarkers = [
+        ...allMarkers.filter(({ marker }) =>
+          data.some(
+            (loc) =>
+              `${loc.lat},${loc.lon}` ===
+              `${marker.getLatLng().lat},${marker.getLatLng().lng}`
+          )
+        ),
+        ...newMarkers,
+      ];
+    })
+    .catch((error) => console.error("Error refreshing markers:", error));
+}
+
+refreshMarkers(map);
