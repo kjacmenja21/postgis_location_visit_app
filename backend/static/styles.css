@@ -118,3 +118,16 @@ body {
   font-weight: bold;
   border: 2px solid #fff;
 }
+
+#timeline-container {
+  margin: 20px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+#timeline {
+  margin-top: 10px;
+}
