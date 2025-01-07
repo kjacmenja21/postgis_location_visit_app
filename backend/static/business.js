@@ -73,6 +73,62 @@ document.getElementById("resetButton").onclick = function () {
   map.setView([45.815, 15.981], 10); // Reset to initial position
 };
 
+document.getElementById("drawPolygonsButton").onclick = async function () {
+  const distance = parseFloat(document.getElementById("distance").value);
+
+  // Ensure distance is a valid number
+  if (isNaN(distance) || distance <= 0) {
+    alert("Please enter a valid distance greater than 0.");
+    return;
+  }
+
+  // Use the coordinates of a "red marker" (you'll need to define this marker in your map logic)
+  const redMarker = tempMarker; // Reference to your red marker (e.g., L.marker instance)
+  const lat = redMarker.getLatLng().lat;
+  const lon = redMarker.getLatLng().lng;
+
+  // Fetch polygons from the API
+  try {
+    const response = await fetch(
+      `/api/nearby_polygons?lat=${lat}&lon=${lon}&distance=${distance}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch polygons: ${response.statusText}`);
+    }
+
+    // Clear existing polygons from the map (optional)
+    if (window.drawnPolygons) {
+      window.drawnPolygons.forEach((polygon) => map.removeLayer(polygon));
+    }
+    window.drawnPolygons = [];
+
+    const data = await response.json();
+
+    data.features.forEach((feature) => {
+      console.log(feature.polygon);
+      // Draw the convex hull polygon (if present)
+      if (feature.polygon) {
+        const polygon = L.geoJSON(feature.polygon).addTo(map);
+        window.drawnPolygons.push(polygon);
+      }
+
+      // Draw the individual points
+      if (feature.polygon.points) {
+        feature.polygon.points.forEach((pointGeoJSON) => {
+          const point = pointGeoJSON.coordinates;
+          L.marker([point[1], point[0]]).addTo(map); // Lat, Lon from GeoJSON [longitude, latitude]
+        });
+      }
+
+      alert("Polygons and points drawn successfully!");
+    });
+  } catch (error) {
+    console.error("Error fetching or drawing polygons:", error);
+    alert("Failed to draw polygons. Check the console for details.");
+  }
+};
+
 // Get user location and center map with a "person" marker
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(function (position) {
