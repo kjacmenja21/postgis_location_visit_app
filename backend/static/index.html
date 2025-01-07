@@ -65,7 +65,18 @@
         <h2>Visualize</h2>
 
         <button class="collapsible">Polygons</button>
-        <div class="content">Test</div>
+        <div class="content">
+          <div class="form-group">
+            <label for="markerName">Distance</label>
+            <input
+              type="number"
+              min="0"
+              id="distance"
+              placeholder="Polygon distance from red marker"
+            />
+            <button id="drawPolygonsButton">Draw polygons</button>
+          </div>
+        </div>
       </div>
 
       <div id="main">
