@@ -71,11 +71,21 @@ document.getElementById("deleteButton").onclick = function () {
 // Reset map functionality
 document.getElementById("resetButton").onclick = function () {
   map.setView([45.815, 15.981], 10); // Reset to initial position
+  if (window.drawnPolygons) {
+    window.drawnPolygons.forEach((polygon) => map.removeLayer(polygon));
+  }
 };
 
 document.getElementById("drawPolygonsButton").onclick = async function () {
-  const distance = parseFloat(document.getElementById("distance").value);
-
+  let distance = document.getElementById("distance").value.trim();
+  // Check if the distance ends with 'km', if so, convert to meters
+  if (distance.toLowerCase().endsWith("km")) {
+    // Remove 'km' and multiply by 1000 to convert to meters
+    distance = parseFloat(distance.slice(0, -2)) * 1000;
+  } else {
+    // If it doesn't end with 'km', treat it as meters
+    distance = parseFloat(distance);
+  }
   // Ensure distance is a valid number
   if (isNaN(distance) || distance <= 0) {
     alert("Please enter a valid distance greater than 0.");
@@ -106,21 +116,11 @@ document.getElementById("drawPolygonsButton").onclick = async function () {
     const data = await response.json();
 
     data.features.forEach((feature) => {
-      console.log(feature.polygon);
       // Draw the convex hull polygon (if present)
       if (feature.polygon) {
         const polygon = L.geoJSON(feature.polygon).addTo(map);
         window.drawnPolygons.push(polygon);
       }
-
-      // Draw the individual points
-      if (feature.polygon.points) {
-        feature.polygon.points.forEach((pointGeoJSON) => {
-          const point = pointGeoJSON.coordinates;
-          L.marker([point[1], point[0]]).addTo(map); // Lat, Lon from GeoJSON [longitude, latitude]
-        });
-      }
-
       alert("Polygons and points drawn successfully!");
     });
   } catch (error) {
