@@ -157,9 +157,9 @@ document.getElementById("heatmapButton").addEventListener("click", function () {
 
       // Create an array of points for the heatmap (format: [lat, lon, intensity])
       var heatmapData = data.features.map((point) => [
-        point.lat,
-        point.lon,
-        point.intensity,
+        point.geometry.coordinates[1], // Latitude
+        point.geometry.coordinates[0], // Longitude
+        point.properties.intensity,
       ]);
 
       // Add the heatmap layer to the map
