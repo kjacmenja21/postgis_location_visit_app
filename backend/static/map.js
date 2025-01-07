@@ -10,6 +10,7 @@ const redIcon = new L.Icon({
 });
 
 let allMarkers = []; // Store all markers for filtering
+let currentPolygon = null;
 // Initialize the map centered on a specific location
 var map = L.map("map").setView([45.815, 15.981], 10); // Centered on Zagreb
 
@@ -29,13 +30,28 @@ var geocoder = L.Control.geocoder({
 })
   .on("markgeocode", function (e) {
     var bbox = e.geocode.bbox;
-    var poly = L.polygon([
-      [bbox.getSouthWest().lat, bbox.getSouthWest().lng],
-      [bbox.getSouthWest().lat, bbox.getNorthEast().lng],
-      [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
-      [bbox.getNorthEast().lat, bbox.getSouthWest().lng],
-    ]).addTo(map);
-    map.fitBounds(poly.getBounds());
+
+    if (currentPolygon) {
+      map.removeLayer(currentPolygon);
+    }
+
+    currentPolygon = L.polygon(
+      [
+        [bbox.getSouthWest().lat, bbox.getSouthWest().lng],
+        [bbox.getSouthWest().lat, bbox.getNorthEast().lng],
+        [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
+        [bbox.getNorthEast().lat, bbox.getSouthWest().lng],
+      ],
+      {
+        // Set the transparency of the fill and stroke
+        fillOpacity: 0.1, // Set fill opacity (0 is fully transparent, 1 is fully opaque)
+        opacity: 0.2, // Set stroke opacity (0 is fully transparent, 1 is fully opaque)
+      }
+    );
+
+    currentPolygon.addTo(map);
+    // Fit the map to the bounds of the new polygon
+    map.fitBounds(currentPolygon.getBounds());
   })
   .addTo(map);
 
