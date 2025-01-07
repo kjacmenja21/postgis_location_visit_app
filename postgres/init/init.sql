@@ -53,10 +53,11 @@ CREATE OR REPLACE FUNCTION insert_marker(
     naziv TEXT,
     opis TEXT,
     lat DOUBLE PRECISION,
-    lon DOUBLE PRECISION
+    lon DOUBLE PRECISION,
+    datum_posjeta DATE
 ) RETURNS VOID AS $$
 BEGIN
-    INSERT INTO lokacije (naziv, opis, geometrija)
-    VALUES (naziv, opis, ST_SetSRID(ST_MakePoint(lon, lat), 4326));
+    INSERT INTO lokacije (naziv, opis, geometrija, datum_posjeta)
+    VALUES (naziv, opis, ST_SetSRID(ST_MakePoint(lon, lat), 4326), datum_posjeta);
 END;
 $$ LANGUAGE plpgsql;
