@@ -137,3 +137,37 @@ BEGIN
     RAISE NOTICE 'Marker with name "%" has been removed.', marker_name;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Function to get heatmap data for Leaflet.js
+-- Enable PostGIS extension
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- Function to generate heatmap data based on clusters
+CREATE OR REPLACE FUNCTION generate_heatmap_data(distance DOUBLE PRECISION)
+RETURNS JSONB AS $$
+DECLARE
+    result JSONB;
+BEGIN
+    -- Query to find clusters using DBSCAN
+    WITH clusters AS (
+        SELECT
+            ST_ClusterDBSCAN(lokacije.geometrija, distance, 2) OVER () AS cluster_id,  -- distance in meters, 2 is the minimum points in a cluster
+            ST_X(lokacije.geometrija) AS lon,
+            ST_Y(lokacije.geometrija) AS lat,
+            COUNT(*) OVER (PARTITION BY ST_ClusterDBSCAN(lokacije.geometrija, distance, 2) OVER ()) AS cluster_size
+        FROM lokacije
+    )
+    -- Prepare heatmap data (latitude, longitude, intensity)
+    SELECT jsonb_agg(
+            jsonb_build_object(
+                'lat', lat,
+                'lon', lon,
+                'intensity', cluster_size
+            )
+        ) INTO result
+    FROM clusters
+    GROUP BY cluster_id;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
