@@ -80,3 +80,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION prevent_duplicate_markers()
+RETURNS TRIGGER AS $$
+DECLARE
+    nearby_count INTEGER;
+BEGIN
+    -- Check for text field duplication
+    IF EXISTS (
+        SELECT 1
+        FROM lokacije
+        WHERE naziv = NEW.naziv
+          AND opis = NEW.opis
+    ) THEN
+        RAISE EXCEPTION 'Duplicate naziv and opis detected';
+    END IF;
+
+    -- Check for proximity within 1 meter
+    SELECT COUNT(*) INTO nearby_count
+    FROM lokacije
+    WHERE ST_DWithin(
+        geometrija,
+        ST_SetSRID(ST_MakePoint(NEW.lon, NEW.lat), 4326),
+        0.00001 -- Approximation for 1 meter in degrees
+    );
+
+    IF nearby_count > 0 THEN
+        RAISE EXCEPTION 'Duplicate location detected within 1 meter';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_duplicate_marker_trigger
+BEFORE INSERT ON lokacije
+FOR EACH ROW
+EXECUTE FUNCTION prevent_duplicate_markers();
