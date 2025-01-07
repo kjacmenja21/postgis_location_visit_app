@@ -35,6 +35,23 @@ document.getElementById("saveButton").onclick = function () {
   }
 };
 
+document.getElementById("deleteButton").onclick = function () {
+  var name = document.getElementById("deleteName").value;
+  if (name) {
+    fetch("/api/add_marker", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        naziv: name,
+        opis: description,
+        lat: tempMarker.getLatLng().lat,
+        lon: tempMarker.getLatLng().lng,
+        datum_posjeta: date || null, // Pass date if provided
+      }),
+    });
+  }
+};
+
 // Reset map functionality
 document.getElementById("resetButton").onclick = function () {
   map.setView([45.815, 15.981], 10); // Reset to initial position
@@ -63,14 +80,3 @@ if (navigator.geolocation) {
       .bindPopup("<b>You are here!</b>");
   });
 }
-
-function fetchLocations(success, error) {
-  fetch("/api/lokacije")
-    .then((response) => response.json())
-    .then(success)
-    .catch(error);
-}
-
-fetchLocations(markersFromLatLon(), (error) =>
-  console.error("Error loading locations:", error)
-);
