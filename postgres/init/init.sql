@@ -148,26 +148,35 @@ RETURNS JSONB AS $$
 DECLARE
     result JSONB;
 BEGIN
-    -- Query to find clusters using DBSCAN
+    -- Step 1: Perform clustering with ST_ClusterDBSCAN
     WITH clusters AS (
         SELECT
             ST_ClusterDBSCAN(lokacije.geometrija, distance, 2) OVER () AS cluster_id,  -- distance in meters, 2 is the minimum points in a cluster
             ST_X(lokacije.geometrija) AS lon,
-            ST_Y(lokacije.geometrija) AS lat,
-            COUNT(*) OVER (PARTITION BY ST_ClusterDBSCAN(lokacije.geometrija, distance, 2) OVER ()) AS cluster_size
+            ST_Y(lokacije.geometrija) AS lat
         FROM lokacije
+    ),
+    -- Step 2: Calculate the size of each cluster
+    cluster_sizes AS (
+        SELECT
+            cluster_id,
+            COUNT(*) AS cluster_size
+        FROM clusters
+        GROUP BY cluster_id
     )
-    -- Prepare heatmap data (latitude, longitude, intensity)
+    -- Step 3: Aggregate the heatmap data (latitude, longitude, and intensity)
     SELECT jsonb_agg(
             jsonb_build_object(
-                'lat', lat,
-                'lon', lon,
-                'intensity', cluster_size
+                'lat', c.lat,
+                'lon', c.lon,
+                'intensity', cs.cluster_size
             )
         ) INTO result
-    FROM clusters
-    GROUP BY cluster_id;
+    FROM clusters c
+    JOIN cluster_sizes cs ON c.cluster_id = cs.cluster_id
+    GROUP BY c.cluster_id;
 
     RETURN result;
 END;
 $$ LANGUAGE plpgsql;
+
