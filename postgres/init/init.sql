@@ -15,7 +15,7 @@ CREATE OR REPLACE FUNCTION get_lokacije()
 RETURNS TABLE (naziv VARCHAR, lon FLOAT, lat FLOAT, opis TEXT) AS $$
 BEGIN
     RETURN QUERY
-    SELECT naziv, ST_X(geometrija)::FLOAT, ST_Y(geometrija)::FLOAT, opis
+    SELECT lokacije.naziv, ST_X(lokacije.geometrija)::FLOAT, ST_Y(lokacije.geometrija)::FLOAT, lokacije.opis
     FROM lokacije;
 END;
 $$ LANGUAGE plpgsql;
