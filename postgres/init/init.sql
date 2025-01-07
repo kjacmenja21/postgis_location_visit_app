@@ -149,14 +149,13 @@ BEGIN
         SELECT
             ST_X(lokacije.geometrija) AS lon,
             ST_Y(lokacije.geometrija) AS lat,
-            COUNT(*) OVER (PARTITION BY ST_DWithin(lokacije.geometrija, target.geometrija, distance)) AS intensity
+            -- Calculate intensity based on the number of points within the specified distance
+            (SELECT COUNT(*)
+             FROM lokacije p
+             WHERE ST_DWithin(lokacije.geometrija, p.geometrija, distance)
+            ) AS intensity
         FROM
-            lokacije AS lokacije,
-            LATERAL (
-                SELECT geometrija
-                FROM lokacije
-                WHERE ST_DWithin(lokacije.geometrija, geometrija, distance)
-            ) AS target
+            lokacije
     )
     SELECT jsonb_agg(
         jsonb_build_object(
