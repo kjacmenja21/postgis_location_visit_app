@@ -165,7 +165,7 @@ BEGIN
         )
         FROM locations p
         WHERE ST_DWithin(
-            ST_Transform(p.geometrija, 3857), -- Transform stored point to EPSG:3857
+            ST_Transform(p.geometry, 3857), -- Transform stored point to EPSG:3857
             point_geometria,
             distance -- distance in meters
         )
