@@ -144,14 +144,14 @@ function refreshMarkers(map) {
             // Select the appropriate icon based on the coordinate type
             let markerIcon;
             if (loc.tip_koordinate === "wishlist") {
-              markerIcon = { icon: yellowIcon }; // Yellow for wishlist
+              markerIcon = yellowIcon; // Yellow for wishlist
             } else if (loc.tip_koordinate === "visited") {
-              markerIcon = null; // Blue for visited
+              markerIcon = blueIcon; // Blue for visited
             } else {
-              markerIcon = null;
+              markerIcon = redIcon; // Default red if unknown
             }
 
-            const marker = L.marker([loc.lat, loc.lon], markerIcon)
+            const marker = L.marker([loc.lat, loc.lon], { icon: markerIcon })
               .addTo(map)
               .bindPopup(
                 `<b>${loc.naziv}</b><br>${loc.opis}<br>${
