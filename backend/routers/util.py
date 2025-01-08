@@ -2,6 +2,12 @@ import os
 
 import psycopg2
 from fastapi import HTTPException
+from pydantic import BaseModel
+
+
+class UserCredentials(BaseModel):
+    username: str
+    password: str
 
 
 # Create a function to connect to the PostgreSQL database

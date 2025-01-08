@@ -3,13 +3,14 @@ from typing import Any
 import psycopg2
 from fastapi import APIRouter, Depends, HTTPException
 
-from .util import get_db
+from .util import UserCredentials, get_db
 
 router = APIRouter()
 
 
 @router.get("/api/nearby_polygons")
 async def get_nearby_polygons(
+    credentials: UserCredentials,
     lat: float,
     lon: float,
     distance: float,
@@ -17,10 +18,21 @@ async def get_nearby_polygons(
 ) -> dict[str, Any]:
     """Fetch polygons within a defined distance from the specified latitude and longitude"""
     cur = db.cursor()
+    user_id = None
     try:
+        # Find the user ID by username and password
+        cur.execute(
+            "SELECT get_user_id(%s, %s);", (credentials.username, credentials.password)
+        )
+        user_id = cur.fetchone()[0]
+
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
         # Call the PostgreSQL function to get nearby polygons
         cur.execute(
-            "SELECT * FROM get_nearby_polygons(%s, %s, %s);", (lat, lon, distance)
+            "SELECT * FROM get_nearby_polygons_by_user(%s, %s, %s, %s);",
+            (lat, lon, distance, user_id),
         )
         rows = cur.fetchall()
     except Exception as e:

@@ -2,16 +2,10 @@ from typing import Any
 
 import psycopg2
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 
-from .util import get_db
+from .util import UserCredentials, get_db
 
 router = APIRouter()
-
-
-class UserCredentials(BaseModel):
-    username: str
-    password: str
 
 
 @router.post("/api/lokacije", response_model=list[dict[str, Any]])
