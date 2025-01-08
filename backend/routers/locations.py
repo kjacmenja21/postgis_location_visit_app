@@ -1,28 +1,55 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import psycopg2
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 
 from .util import get_db
 
 router = APIRouter()
 
 
-@router.get("/api/lokacije", response_model=List[Dict[str, Any]])
+class UserCredentials(BaseModel):
+    username: str
+    password: str
+
+
+@router.post("/api/lokacije", response_model=list[dict[str, Any]])
 async def get_lokacije(
+    credentials: UserCredentials,
     db: psycopg2.extensions.connection = Depends(get_db),
 ) -> list[dict[str, Any]]:
-    """Fetch all locations"""
+    """Fetch all locations for a given user."""
     cur = db.cursor()
+    user_id = None
+
     try:
-        cur.execute("SELECT * FROM get_lokacije();")
+        # Find the user ID by username and password
+        cur.execute(
+            "SELECT get_user_id(%s, %s);", (credentials.username, credentials.password)
+        )
+        user_id = cur.fetchone()[0]
+
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        # Fetch locations for the user
+        cur.execute("SELECT * FROM get_user_locations(%s);", (user_id,))
         rows = cur.fetchall()
+
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to fetch locations") from e
     finally:
         cur.close()
 
     return [
-        {"naziv": r[0], "lon": r[1], "lat": r[2], "opis": r[3], "datum_posjeta": r[4]}
+        {
+            "naziv": r[0],
+            "lon": r[1],
+            "lat": r[2],
+            "opis": r[3],
+            "datum_posjeta": r[4],
+            "tip_koordinate": r[5],
+        }
         for r in rows
     ]

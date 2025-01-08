@@ -81,8 +81,29 @@ map.on("mouseup", (e) => {
 
 // Function to refresh markers
 function refreshMarkers(map) {
-  fetch("/api/lokacije")
-    .then((response) => response.json())
+  let username = document.getElementById("username").value.trim();
+  let password = document.getElementById("password").value.trim();
+
+  // Check if username and password are provided
+  if (!username || !password) {
+    console.error("Username and password are required.");
+    alert("Please enter both username and password.");
+    return;
+  }
+
+  fetch("/api/lokacije", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }), // Send credentials in the body
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
       // Create a Set of current marker coordinates for comparison
       const currentCoords = new Set(

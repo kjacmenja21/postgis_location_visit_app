@@ -74,6 +74,7 @@ document.getElementById("resetButton").onclick = function () {
   if (window.drawnPolygons) {
     window.drawnPolygons.forEach((polygon) => map.removeLayer(polygon));
   }
+  refreshMarkers(map);
 };
 
 document.getElementById("drawPolygonsButton").onclick = async function () {

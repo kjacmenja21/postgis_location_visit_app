@@ -8,6 +8,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
+    salt TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -30,34 +31,60 @@ CREATE OR REPLACE FUNCTION register_user(
     password TEXT
 ) RETURNS VOID AS $$
 DECLARE
-    salt TEXT := gen_random_bytes(16)::TEXT;
+    salt TEXT := gen_random_bytes(16)::TEXT;  -- Generate a random salt
     salted_hash TEXT;
 BEGIN
     salted_hash := crypt(password || salt, gen_salt('bf'));
 
-    INSERT INTO users (username, password_hash)
-    VALUES (username, salted_hash);
+    -- Insert the username, password hash, and salt into the users table
+    INSERT INTO users (username, password_hash, salt)
+    VALUES (username, salted_hash, salt);
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- Function to log in a user
 CREATE OR REPLACE FUNCTION login_user(
-    username TEXT,
-    password TEXT
+    username_param TEXT,
+    password_param TEXT
 ) RETURNS BOOLEAN AS $$
 DECLARE
     stored_hash TEXT;
+    stored_salt TEXT;
     is_authenticated BOOLEAN := FALSE;
 BEGIN
-    SELECT password_hash INTO stored_hash
+    -- Retrieve the stored hash and salt from the users table
+    SELECT password_hash, salt INTO stored_hash, stored_salt
     FROM users
-    WHERE username = username;
+    WHERE users.username = username_param;
 
-    IF stored_hash IS NOT NULL AND crypt(password, stored_hash) = stored_hash THEN
+    IF stored_hash IS NOT NULL AND crypt(password_param || stored_salt, stored_hash) = stored_hash THEN
         is_authenticated := TRUE;
     END IF;
 
     RETURN is_authenticated;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_user_id(
+    usrnm TEXT,
+    password_param TEXT
+) RETURNS INT AS $$
+DECLARE
+    user_id INT;
+BEGIN
+    -- Ensure that the login_user function is used to validate credentials
+    SELECT id INTO user_id
+    FROM users
+    WHERE users.username = usrnm
+      AND login_user(usrnm, password_param);  -- Use the updated login_user function
+
+    IF user_id IS NULL THEN
+        RAISE EXCEPTION 'Invalid username or password';
+    END IF;
+
+    RETURN user_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -114,9 +141,10 @@ BEGIN
         locations.visit_date,
         locations.coord_type
     FROM locations
-    WHERE locations.user_id = user_id;
+    WHERE locations.user_id = $1;  -- Use $1 to refer to the function parameter
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION get_nearby_polygons(
     lat DOUBLE PRECISION,
