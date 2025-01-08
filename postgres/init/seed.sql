@@ -48,6 +48,30 @@ SELECT insert_marker(2, 'Drava River Bank', 'The scenic river bank area in Vara�
 SELECT insert_marker(3, 'Varaždin Cemetery', 'A large historical cemetery located on the outskirts of Varaždin', 46.3113, 16.3486, 'visited', random_date());
 SELECT insert_marker(1, 'St. George’s Church', 'An important church located in the city center of Varaždin', 46.3060, 16.3367, 'wishlist', random_date());
 
+-- Additional Varaždin Locations
+SELECT insert_marker(1, 'Varaždin Town Hall', 'A historical building located in the heart of Varaždin with a beautiful clock tower', 46.3036, 16.3402, 'visited', random_date());
+SELECT insert_marker(2, 'Varaždin Baroque Ensemble', 'A group of historical buildings showcasing the baroque architectural style of Varaždin', 46.3054, 16.3386, 'wishlist', random_date());
+SELECT insert_marker(3, 'Varaždin Synagogue', 'The historical synagogue of Varaždin, an important cultural landmark', 46.3063, 16.3378, 'visited', random_date());
+SELECT insert_marker(1, 'Varaždin Cathedral', 'The Cathedral of St. Nicholas, a prominent baroque church in Varaždin', 46.3049, 16.3381, 'wishlist', random_date());
+SELECT insert_marker(2, 'Varaždin Train Station', 'A railway station connecting Varaždin to other major Croatian cities', 46.3019, 16.3418, 'visited', random_date());
+SELECT insert_marker(3, 'Varaždin City Park', 'A spacious park ideal for relaxation and outdoor activities', 46.3053, 16.3407, 'wishlist', random_date());
+SELECT insert_marker(1, 'Varaždin Water Tower', 'A historic water tower providing panoramic views of the city', 46.3069, 16.3412, 'visited', random_date());
+SELECT insert_marker(2, 'Varaždin Library', 'A modern library located near the town square, offering a wide range of books and digital media', 46.3045, 16.3395, 'wishlist', random_date());
+SELECT insert_marker(3, 'Varaždin Bridge', 'A bridge connecting the two parts of the city, with beautiful views of the Drava River', 46.3075, 16.3390, 'visited', random_date());
+SELECT insert_marker(1, 'Varaždin Observation Deck', 'A lookout point with a panoramic view of the city and surrounding countryside', 46.3072, 16.3365, 'wishlist', random_date());
+SELECT insert_marker(2, 'Varaždin Theater', 'A historic theater showcasing local performances and international plays', 46.3032, 16.3400, 'visited', random_date());
+SELECT insert_marker(3, 'Varaždin Aquatic Center', 'A large sports complex with swimming pools and recreational facilities', 46.3080, 16.3358, 'wishlist', random_date());
+SELECT insert_marker(1, 'Varaždin Outdoor Market', 'A popular market where locals sell fresh produce, flowers, and handmade goods', 46.3041, 16.3384, 'visited', random_date());
+SELECT insert_marker(2, 'Varaždin Historical Society', 'A museum dedicated to the history of Varaždin, its people, and their culture', 46.3030, 16.3364, 'wishlist', random_date());
+SELECT insert_marker(3, 'Varaždin Amphitheater', 'An ancient Roman amphitheater that hosts various events and concerts', 46.3090, 16.3440, 'visited', random_date());
+SELECT insert_marker(1, 'Varaždin Golf Course', 'A scenic golf course located just outside the city', 46.3070, 16.3405, 'wishlist', random_date());
+SELECT insert_marker(2, 'Varaždin Brewery', 'A historical brewery known for producing some of the best local beer in Varaždin', 46.3050, 16.3422, 'visited', random_date());
+SELECT insert_marker(3, 'Varaždin Zoo', 'A small zoo that features native Croatian wildlife as well as exotic animals', 46.3100, 16.3450, 'wishlist', random_date());
+SELECT insert_marker(1, 'Varaždin Botanical Garden', 'A beautiful botanical garden showcasing a variety of plants and flowers', 46.3057, 16.3360, 'visited', random_date());
+SELECT insert_marker(2, 'Varaždin City Hall', 'A historical city hall, now a cultural center and event space', 46.3042, 16.3405, 'wishlist', random_date());
+SELECT insert_marker(3, 'Varaždin Nature Reserve', 'A nature reserve located just outside the city, ideal for hiking and bird watching', 46.3115, 16.3510, 'visited', random_date());
+
+
 -- Additional Locations in between Zagreb and Varaždin (within ~50km radius)
 SELECT insert_marker(2, 'Ludbreg', 'A town located between Zagreb and Varaždin, known for its religious significance', 46.2850, 16.4167, 'visited', random_date());
 SELECT insert_marker(3, 'Breznica', 'A small village located south of Varaždin, Croatia', 46.2219, 16.3422, 'wishlist', random_date());
