@@ -9,6 +9,28 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+const yellowIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const blueIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
 let allMarkers = []; // Store all markers for filtering
 let currentPolygon = null;
 // Initialize the map centered on a specific location
@@ -119,7 +141,17 @@ function refreshMarkers(map) {
 
           // If the marker is not already on the map, create it
           if (!currentCoords.has(coordsKey)) {
-            const marker = L.marker([loc.lat, loc.lon])
+            // Select the appropriate icon based on the coordinate type
+            let markerIcon;
+            if (loc.tip_koordinate === "wishlist") {
+              markerIcon = yellowIcon; // Yellow for wishlist
+            } else if (loc.tip_koordinate === "visited") {
+              markerIcon = blueIcon; // Blue for visited
+            } else {
+              markerIcon = redIcon; // Default red icon if not specified
+            }
+
+            const marker = L.marker([loc.lat, loc.lon], { icon: markerIcon })
               .addTo(map)
               .bindPopup(
                 `<b>${loc.naziv}</b><br>${loc.opis}<br>${
