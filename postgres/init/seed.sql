@@ -89,9 +89,9 @@ SELECT insert_marker(2, 'Vatican City', 'Home of the Pope and a UNESCO World Her
 SELECT insert_marker(3, 'Pantheon', 'Ancient Roman temple known for its magnificent dome', 41.8986, 12.4769, 'visited', random_date());
 
 -- Venice, Italy
-SELECT insert_marker(1, 'St. Mark\'s Basilica', 'Iconic cathedral in the main square of Venice', 45.4340, 12.3386, 'visited', random_date());
+SELECT insert_marker(1, 'St. Mark\s Basilica', 'Iconic cathedral in the main square of Venice', 45.4340, 12.3386, 'visited', random_date());
 SELECT insert_marker(2, 'Rialto Bridge', 'Famous bridge spanning the Grand Canal in Venice', 45.4390, 12.3347, 'wishlist', random_date());
-SELECT insert_marker(3, 'Doge\'s Palace', 'Former palace and seat of the government in Venice', 45.4348, 12.3347, 'visited', random_date());
+SELECT insert_marker(3, 'Doge\s Palace', 'Former palace and seat of the government in Venice', 45.4348, 12.3347, 'visited', random_date());
 
 -- Barcelona, Spain
 SELECT insert_marker(1, 'Sagrada Familia', 'Famous basilica designed by Antoni Gaudí', 41.4036, 2.1744, 'visited', random_date());
