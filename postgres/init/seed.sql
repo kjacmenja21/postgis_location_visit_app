@@ -12,18 +12,6 @@ SELECT register_user('user1', 'password1');
 SELECT register_user('user2', 'password2');
 SELECT register_user('user3', 'password3');
 
--- Inserting sample markers using the insert_marker function with random dates and user associations
-SELECT insert_marker(1, 'Eiffel Tower', 'A wrought-iron lattice tower in Paris, France', 48.8584, 2.2945, 'visited', random_date());
-SELECT insert_marker(2, 'Great Wall of China', 'An ancient series of walls and fortifications located in northern China', 40.4319, 116.5704, 'wishlist', random_date());
-SELECT insert_marker(3, 'Statue of Liberty', 'A colossal neoclassical sculpture on Liberty Island in New York City, USA', 40.6892, -74.0445, 'visited', random_date());
-SELECT insert_marker(1, 'Machu Picchu', 'An Incan citadel located in the Eastern Andes in Peru', -13.1631, -72.5450, 'wishlist', random_date());
-SELECT insert_marker(2, 'Pyramids of Giza', 'Ancient pyramid structures located in Giza, Egypt', 29.9792, 31.1342, 'visited', random_date());
-SELECT insert_marker(3, 'Sydney Opera House', 'A multi-venue performing arts center in Sydney, Australia', -33.8568, 151.2153, 'visited', random_date());
-SELECT insert_marker(1, 'Colosseum', 'An ancient amphitheater located in the center of Rome, Italy', 41.8902, 12.4922, 'wishlist', random_date());
-SELECT insert_marker(2, 'Taj Mahal', 'A white marble mausoleum located in Agra, India', 27.1751, 78.0421, 'visited', random_date());
-SELECT insert_marker(3, 'Christ the Redeemer', 'A large statue of Jesus Christ in Rio de Janeiro, Brazil', -22.9519, -43.2105, 'wishlist', random_date());
-SELECT insert_marker(1, 'Mount Fuji', 'An active stratovolcano located in Japan', 35.3606, 138.7274, 'visited', random_date());
-
 -- Zagreb Locations
 SELECT insert_marker(2, 'Ban Jelačić Square', 'Main square in the center of Zagreb, Croatia', 45.8131, 15.978, 'visited', random_date());
 SELECT insert_marker(1, 'Zagreb Cathedral', 'The cathedral of the Archdiocese of Zagreb, Croatia', 45.8138, 15.9786, 'wishlist', random_date());
@@ -71,6 +59,69 @@ SELECT insert_marker(1, 'Varaždin Botanical Garden', 'A beautiful botanical gar
 SELECT insert_marker(2, 'Varaždin City Hall', 'A historical city hall, now a cultural center and event space', 46.3042, 16.3405, 'wishlist', random_date());
 SELECT insert_marker(3, 'Varaždin Nature Reserve', 'A nature reserve located just outside the city, ideal for hiking and bird watching', 46.3115, 16.3510, 'visited', random_date());
 
+-- New York City, USA
+SELECT insert_marker(1, 'Statue of Liberty', 'Iconic symbol of freedom located on Liberty Island', 40.6892, -74.0445, 'visited', random_date());
+SELECT insert_marker(2, 'Central Park', 'A large public park in Manhattan offering various recreational activities', 40.7851, -73.9683, 'wishlist', random_date());
+SELECT insert_marker(3, 'Empire State Building', 'Famous skyscraper offering panoramic views of the city', 40.748817, -73.985428, 'visited', random_date());
+
+-- Los Angeles, USA
+SELECT insert_marker(1, 'Hollywood Sign', 'Famous landmark in the Hollywood Hills overlooking Los Angeles', 34.1341, -118.3215, 'wishlist', random_date());
+SELECT insert_marker(2, 'Santa Monica Pier', 'Popular amusement pier located in Santa Monica, California', 34.0226, -118.4957, 'visited', random_date());
+SELECT insert_marker(3, 'Griffith Observatory', 'Observatory offering amazing views of Los Angeles and the Hollywood sign', 34.1184, -118.3004, 'visited', random_date());
+
+-- Chicago, USA
+SELECT insert_marker(1, 'Millennium Park', 'Public park in the heart of downtown Chicago featuring the famous Cloud Gate sculpture', 41.8826, -87.6233, 'wishlist', random_date());
+SELECT insert_marker(2, 'Willis Tower', 'Famous skyscraper with an observation deck offering stunning views of the city', 41.8789, -87.6359, 'visited', random_date());
+SELECT insert_marker(3, 'Navy Pier', 'Popular tourist destination featuring rides, restaurants, and shops', 41.8916, -87.6095, 'visited', random_date());
+
+-- London, UK
+SELECT insert_marker(1, 'Big Ben', 'Famous clock tower located at the north end of the Palace of Westminster', 51.5007, -0.1246, 'visited', random_date());
+SELECT insert_marker(2, 'The British Museum', 'A world-famous museum showcasing artifacts from ancient civilizations', 51.5194, -0.1270, 'wishlist', random_date());
+SELECT insert_marker(3, 'London Eye', 'Giant Ferris wheel offering stunning views of the city', 51.5033, -0.1196, 'visited', random_date());
+
+-- Paris, France
+SELECT insert_marker(2, 'Louvre Museum', 'World-renowned museum housing famous art like the Mona Lisa', 48.8606, 2.3376, 'wishlist', random_date());
+SELECT insert_marker(3, 'Notre-Dame Cathedral', 'Famous Gothic cathedral located on the Île de la Cité in Paris', 48.8529, 2.3500, 'visited', random_date());
+
+-- Rome, Italy
+SELECT insert_marker(1, 'Colosseum', 'Ancient Roman gladiatorial arena located in the center of Rome', 41.8902, 12.4922, 'visited', random_date());
+SELECT insert_marker(2, 'Vatican City', 'Home of the Pope and a UNESCO World Heritage site', 41.9029, 12.4534, 'wishlist', random_date());
+SELECT insert_marker(3, 'Pantheon', 'Ancient Roman temple known for its magnificent dome', 41.8986, 12.4769, 'visited', random_date());
+
+-- Venice, Italy
+SELECT insert_marker(1, 'St. Mark\'s Basilica', 'Iconic cathedral in the main square of Venice', 45.4340, 12.3386, 'visited', random_date());
+SELECT insert_marker(2, 'Rialto Bridge', 'Famous bridge spanning the Grand Canal in Venice', 45.4390, 12.3347, 'wishlist', random_date());
+SELECT insert_marker(3, 'Doge\'s Palace', 'Former palace and seat of the government in Venice', 45.4348, 12.3347, 'visited', random_date());
+
+-- Barcelona, Spain
+SELECT insert_marker(1, 'Sagrada Familia', 'Famous basilica designed by Antoni Gaudí', 41.4036, 2.1744, 'visited', random_date());
+SELECT insert_marker(2, 'Park Güell', 'Public park designed by Antoni Gaudí featuring colorful mosaics', 41.4145, 2.1527, 'wishlist', random_date());
+SELECT insert_marker(3, 'La Rambla', 'Famous tree-lined street in central Barcelona', 41.3809, 2.1923, 'visited', random_date());
+
+-- Madrid, Spain
+SELECT insert_marker(1, 'Royal Palace of Madrid', 'Official residence of the Spanish Royal Family', 40.4179, -3.7143, 'visited', random_date());
+SELECT insert_marker(2, 'Prado Museum', 'Famous museum in Madrid housing one of the finest collections of European art', 40.4138, -3.6921, 'wishlist', random_date());
+SELECT insert_marker(3, 'Puerta del Sol', 'Central square in Madrid known for the clock tower and New Years Eve tradition', 40.4168, -3.7038, 'visited', random_date());
+
+-- Tokyo, Japan
+SELECT insert_marker(1, 'Tokyo Tower', 'Iconic red and white tower providing panoramic views of Tokyo', 35.6586, 139.7454, 'visited', random_date());
+SELECT insert_marker(2, 'Senso-ji Temple', 'The oldest and most significant Buddhist temple in Tokyo', 35.7148, 139.7967, 'wishlist', random_date());
+SELECT insert_marker(3, 'Shibuya Crossing', 'Famous pedestrian scramble and symbol of Tokyo’s bustling city life', 35.6580, 139.7013, 'visited', random_date());
+
+-- Kyoto, Japan
+SELECT insert_marker(1, 'Kinkaku-ji', 'Golden Pavilion, a Zen Buddhist temple and UNESCO World Heritage Site', 35.0394, 135.7292, 'visited', random_date());
+SELECT insert_marker(2, 'Fushimi Inari-taisha', 'Famous shrine known for its thousands of vermilion torii gates', 35.0390, 135.7765, 'wishlist', random_date());
+SELECT insert_marker(3, 'Arashiyama Bamboo Grove', 'A scenic bamboo forest and popular tourist attraction', 35.0094, 135.6758, 'visited', random_date());
+
+-- Sydney, Australia
+SELECT insert_marker(1, 'Sydney Opera House', 'Iconic performing arts venue with a distinctive sail-like design', -33.8568, 151.2153, 'visited', random_date());
+SELECT insert_marker(2, 'Sydney Harbour Bridge', 'Famous bridge linking the central business district to the North Shore', -33.8486, 151.2108, 'wishlist', random_date());
+SELECT insert_marker(3, 'Bondi Beach', 'Popular beach known for surfing and its coastal walk', -33.8908, 151.2743, 'visited', random_date());
+
+-- Melbourne, Australia
+SELECT insert_marker(1, 'Royal Botanic Gardens', 'Scenic gardens offering walking paths and waterfront views', -37.8303, 144.9741, 'visited', random_date());
+SELECT insert_marker(2, 'Federation Square', 'Iconic public space with cultural attractions and restaurants', -37.8186, 144.9670, 'wishlist', random_date());
+SELECT insert_marker(3, 'Queen Victoria Market', 'Large open-air market with food, clothing, and souvenirs', -37.8075, 144.9577, 'visited', random_date());
 
 -- Additional Locations in between Zagreb and Varaždin (within ~50km radius)
 SELECT insert_marker(2, 'Ludbreg', 'A town located between Zagreb and Varaždin, known for its religious significance', 46.2850, 16.4167, 'visited', random_date());
