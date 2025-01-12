@@ -19,7 +19,7 @@ async def get_lokacije(
 
     try:
         # Find the user ID by username and password
-        user_id = get_user(cur, credentials.username, credentials.password)
+        user_id = get_user(credentials.username, credentials.password, cur)
 
         # Fetch locations for the user
         cur.execute("SELECT * FROM get_user_locations(%s);", (user_id,))
