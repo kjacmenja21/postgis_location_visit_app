@@ -76,11 +76,16 @@ document.getElementById("deleteButton").onclick = function () {
 // Reset map functionality
 document.getElementById("resetButton").onclick = function () {
   map.setView([45.815, 15.981], 10); // Reset to initial position
+  clearDrawnPolygons();
+  clearHeatmap();
+  refreshMarkers(map);
+};
+
+function clearDrawnPolygons() {
   if (window.drawnPolygons) {
     window.drawnPolygons.forEach((polygon) => map.removeLayer(polygon));
   }
-  refreshMarkers(map);
-};
+}
 
 function getPolygonDistance() {
   let distance = document.getElementById("polygonDistance").value.trim();
@@ -178,9 +183,7 @@ document.getElementById("heatmapButton").addEventListener("click", function () {
     .then((response) => response.json())
     .then((data) => {
       // Clear any existing heatmap layers before adding a new one
-      if (window.heatmapLayer) {
-        map.removeLayer(window.heatmapLayer);
-      }
+      clearHeatmap();
 
       // Create an array of points for the heatmap (format: [lat, lon, intensity])
       var heatmapData = data.features.map((point) => [
@@ -220,4 +223,9 @@ if (navigator.geolocation) {
       .addTo(map)
       .bindPopup("<b>You are here!</b>");
   });
+}
+function clearHeatmap() {
+  if (window.heatmapLayer) {
+    map.removeLayer(window.heatmapLayer);
+  }
 }
