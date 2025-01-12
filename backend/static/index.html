@@ -84,7 +84,7 @@
 
         <h2>Visualize</h2>
 
-        <button class="collapsible">Polygons</button>
+        <button class="collapsible">Marker Area</button>
         <div class="content">
           <div class="form-group">
             <label for="markerName">Distance</label>
@@ -97,16 +97,18 @@
             <button id="drawPolygonsButton">Draw polygons</button>
           </div>
         </div>
-        <button class="collapsible">Heatmaps</button>
+        <button class="collapsible">Density Heatmap</button>
         <div class="content">
-          <label for="heatmapDistance">Heatmap radius</label>
-          <input
-            type="text"
-            min="0"
-            id="heatmapDistance"
-            placeholder="Radius for a cluster (m/km)"
-          />
-          <button id="heatmapButton">Load Heatmap</button>
+          <div class="form-group">
+            <label for="heatmapDistance">Heatmap radius</label>
+            <input
+              type="text"
+              min="0"
+              id="heatmapDistance"
+              placeholder="Radius for a cluster (m/km)"
+            />
+            <button id="heatmapButton">Load Heatmap</button>
+          </div>
         </div>
       </div>
 
