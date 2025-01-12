@@ -221,3 +221,80 @@ function clearHeatmap() {
     map.removeLayer(window.heatmapLayer);
   }
 }
+
+document.getElementById("planButton").addEventListener("click", function () {
+  const startDate = new Date(document.getElementById("startDate").value);
+  const endDate = new Date(document.getElementById("endDate").value);
+  const planType = document.getElementById("planType").value;
+  console.log(startDate, endDate, planType);
+
+  const body = JSON.stringify({
+    username: getUsername(),
+    password: getPassword(),
+    coord_type: planType,
+    start_date: getDateFormat(startDate),
+    end_date: getDateFormat(endDate),
+  });
+
+  console.log(body);
+
+  fetch(`/api/travel_plan`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: body,
+  }).then(async (response) => {
+    const data = await response.json();
+    console.log(data);
+
+    drawTravelPlan(data, map);
+  });
+});
+
+function getDateFormat(date) {
+  return date.toISOString().split("T")[0];
+}
+
+function drawTravelPlan(data, map) {
+  // Parse the data
+  const travelPlan = data; // The data is directly an array of objects
+  const { type: coord_type } = travelPlan.type;
+
+  // Extract coordinates from the data array and ensure they are valid
+  const coordinates = travelPlan.data[0][0].coordinates
+    .map((item) => {
+      if (item.lon !== undefined && item.lat !== undefined) {
+        return [item.lon, item.lat];
+      } else {
+        console.error("Invalid coordinate found:", item);
+        return null; // Skip invalid coordinates
+      }
+    })
+    .filter((coord) => coord !== null); // Remove any null coordinates
+
+  // Check if there are any valid coordinates left
+  if (coordinates.length === 0) {
+    console.error("No valid coordinates to display.");
+    return; // Exit the function if no valid coordinates
+  }
+
+  // Create a polyline from the coordinates
+  const polyline = L.polyline(coordinates, {
+    color: coord_type === "wishlist" ? "blue" : "yellow", // Set color based on type
+    weight: 4, // Thickness of the line
+    opacity: 0.8, // Line opacity
+  });
+
+  // Add the polyline to the map
+  polyline.addTo(map);
+
+  // Add a popup showing details about the travel plan
+  polyline.bindPopup(`
+      <strong>Travel Plan</strong><br>
+      <b>Type:</b> ${coord_type}<br>
+  `);
+
+  // <b>Start Date:</b> ${start_date}<br>
+  // <b>End Date:</b> ${end_date}
+  // Adjust the map view to fit the polyline bounds
+  map.fitBounds(polyline.getBounds());
+}
