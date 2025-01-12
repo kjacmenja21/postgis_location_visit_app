@@ -3,6 +3,7 @@ document.getElementById("saveButton").onclick = function () {
   var name = document.getElementById("markerName").value;
   var description = document.getElementById("markerDescription").value;
   var date = document.getElementById("markerDate").value;
+  var coord_type = document.getElementById("markerType").value;
 
   if (name && description) {
     // Save marker to the backend
@@ -16,7 +17,7 @@ document.getElementById("saveButton").onclick = function () {
         description: description,
         lat: tempMarker.getLatLng().lat,
         lon: tempMarker.getLatLng().lng,
-        coord_type: "wishlist",
+        coord_type: coord_type,
         visit_date: date || null, // Pass date if provided
       }),
     })
@@ -29,6 +30,7 @@ document.getElementById("saveButton").onclick = function () {
         } else {
           alert("Failed to add marker.");
           tempMarker.remove();
+          tempMarker = null;
         }
       })
       .then(() => refreshMarkers(map))
