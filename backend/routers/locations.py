@@ -3,7 +3,7 @@ from typing import Any
 import psycopg2
 from fastapi import APIRouter, Depends, HTTPException
 
-from .util import UserCredentials, get_db
+from .util import UserCredentials, get_db, get_user
 
 router = APIRouter()
 
@@ -19,13 +19,7 @@ async def get_lokacije(
 
     try:
         # Find the user ID by username and password
-        cur.execute(
-            "SELECT get_user_id(%s, %s);", (credentials.username, credentials.password)
-        )
-        user_id = cur.fetchone()[0]
-
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid username or password")
+        user_id = get_user(cur, credentials.username, credentials.password)
 
         # Fetch locations for the user
         cur.execute("SELECT * FROM get_user_locations(%s);", (user_id,))
