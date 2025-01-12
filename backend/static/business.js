@@ -47,7 +47,9 @@ document.getElementById("deleteButton").onclick = function () {
       method: "DELETE", // Correct HTTP method for deletion
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        naziv: name, // Pass the marker name to delete
+        username: getUsername(),
+        password: getPassword(),
+        name: name, // Pass the marker name to delete
       }),
     })
       .then((response) => {
@@ -80,7 +82,7 @@ document.getElementById("resetButton").onclick = function () {
   refreshMarkers(map);
 };
 
-document.getElementById("drawPolygonsButton").onclick = async function () {
+function getPolygonDistance() {
   let distance = document.getElementById("polygonDistance").value.trim();
   // Check if the distance ends with 'km', if so, convert to meters
   if (distance.toLowerCase().endsWith("km")) {
@@ -95,43 +97,56 @@ document.getElementById("drawPolygonsButton").onclick = async function () {
     alert("Please enter a valid distance greater than 0.");
     return;
   }
+}
 
+document.getElementById("drawPolygonsButton").onclick = async function () {
+  let distance = getPolygonDistance();
   // Use the coordinates of a "red marker" (you'll need to define this marker in your map logic)
   const redMarker = tempMarker; // Reference to your red marker (e.g., L.marker instance)
   const lat = redMarker.getLatLng().lat;
   const lon = redMarker.getLatLng().lng;
 
   // Fetch polygons from the API
-  try {
-    const response = await fetch(
-      `/api/nearby_polygons?lat=${lat}&lon=${lon}&distance=${distance}`
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch polygons: ${response.statusText}`);
-    }
-
-    // Clear existing polygons from the map (optional)
-    if (window.drawnPolygons) {
-      window.drawnPolygons.forEach((polygon) => map.removeLayer(polygon));
-    }
-    window.drawnPolygons = [];
-
-    const data = await response.json();
-
-    data.features.forEach((feature) => {
-      // Draw the convex hull polygon (if present)
-      if (feature.polygon) {
-        const polygon = L.geoJSON(feature.polygon).addTo(map);
-        window.drawnPolygons.push(polygon);
-      }
-      alert("Polygons and points drawn successfully!");
+  fetch(`/api/nearby_polygons`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: getUsername(),
+      password: getPassword(),
+      lat,
+      lon,
+      distance,
+    }),
+  })
+    .then((response) => {
+      alert("YIPPIE");
+    })
+    .catch((error) => {
+      alert("Darn");
     });
-  } catch (error) {
-    console.error("Error fetching or drawing polygons:", error);
-    alert("Failed to draw polygons. Check the console for details.");
-  }
 };
+
+// .then(response => {
+//   if (window.drawnPolygons) {
+//     window.drawnPolygons.forEach((polygon) => map.removeLayer(polygon));
+//   }
+//   window.drawnPolygons = [];
+
+//   const data = await response.json();
+
+//   data.features.forEach((feature) => {
+//     // Draw the convex hull polygon (if present)
+//     if (feature.polygon) {
+//       const polygon = L.geoJSON(feature.polygon).addTo(map);
+//       window.drawnPolygons.push(polygon);
+//     }
+//     alert("Polygons and points drawn successfully!");
+//   });
+// })
+// .catch (error => {
+// console.error("Error fetching or drawing polygons:", error);
+// alert("Failed to draw polygons. Check the console for details.");
+// });
 
 // Event listener for the heatmap button
 document.getElementById("heatmapButton").addEventListener("click", function () {
@@ -151,7 +166,15 @@ document.getElementById("heatmapButton").addEventListener("click", function () {
   }
 
   // Fetch the heatmap data from the API
-  fetch(`/api/heatmap_data?distance=${distance}`)
+  fetch(`/api/heatmap_data?distance=${distance}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      distance: distance,
+      username: getUsername(),
+      password: getPassword(),
+    }),
+  })
     .then((response) => response.json())
     .then((data) => {
       // Clear any existing heatmap layers before adding a new one
