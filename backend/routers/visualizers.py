@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 import psycopg2
@@ -6,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from .util import UserCredentials, get_db, get_user
 
 router = APIRouter()
+logger = logging.getLogger("uvicorn.error")
 
 
 class NearbyPolygons(UserCredentials):
@@ -29,11 +31,14 @@ async def get_nearby_polygons(
     try:
         # Find the user ID by username and password
         user_id = get_user(body.username, body.password, cur)
+        logger.debug(user_id)
+        logger.debug(body)
         # Call the PostgreSQL function to get nearby polygons
         cur.execute(
             "SELECT * FROM get_nearby_polygons_by_user(%s, %s, %s, %s);",
             (body.lat, body.lon, body.distance, user_id),
         )
+
         rows = cur.fetchall()
     except Exception as e:
         raise HTTPException(
