@@ -271,6 +271,7 @@ BEGIN
         SELECT
             ST_Y(locations.geometry) AS lon,
             ST_X(locations.geometry) AS lat,
+            locations.visit_date,  -- Add visit_date to the selection
             row_number() OVER (ORDER BY locations.visit_date) AS idx
         FROM locations
         WHERE locations.user_id = usr_id
@@ -284,7 +285,8 @@ BEGIN
             jsonb_build_object(
                 'index', idx,  -- Use the row number as 'index'
                 'lon', lon,
-                'lat', lat
+                'lat', lat,
+                'visit_date', visit_date  -- Add the visit_date field here
             )
         )
     ) INTO result
@@ -293,4 +295,5 @@ BEGIN
     RETURN result;
 END;
 $$ LANGUAGE plpgsql;
+
 

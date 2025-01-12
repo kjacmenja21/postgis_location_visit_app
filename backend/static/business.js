@@ -257,7 +257,7 @@ function getDateFormat(date) {
 function drawTravelPlan(data, map) {
   // Parse the data
   const travelPlan = data; // The data is directly an array of objects
-  const { type: coord_type } = travelPlan.type;
+  const coord_type = travelPlan.type;
 
   // Extract coordinates from the data array and ensure they are valid
   const coordinates = travelPlan.data[0][0].coordinates
@@ -279,7 +279,7 @@ function drawTravelPlan(data, map) {
 
   // Create a polyline from the coordinates
   const polyline = L.polyline(coordinates, {
-    color: coord_type === "wishlist" ? "blue" : "yellow", // Set color based on type
+    color: coord_type === "wishlist" ? "yellow" : "blue", // Set color based on type
     weight: 4, // Thickness of the line
     opacity: 0.8, // Line opacity
   });
