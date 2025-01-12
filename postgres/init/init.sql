@@ -113,7 +113,7 @@ CREATE OR REPLACE FUNCTION insert_marker(
     lat DOUBLE PRECISION,
     lon DOUBLE PRECISION,
     coord_type coordinate_type,
-    visit_date DATE
+    visit_date DATE DEFAULT NULL
 ) RETURNS VOID AS $$
 BEGIN
     INSERT INTO locations (user_id, name, description, geometry, coord_type, visit_date)

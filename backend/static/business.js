@@ -10,11 +10,14 @@ document.getElementById("saveButton").onclick = function () {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        naziv: name,
-        opis: description,
+        username: getUsername(),
+        password: getPassword(),
+        name: name,
+        description: description,
         lat: tempMarker.getLatLng().lat,
         lon: tempMarker.getLatLng().lng,
-        datum_posjeta: date || null, // Pass date if provided
+        coord_type: "wishlist",
+        visit_date: date || null, // Pass date if provided
       }),
     })
       .then((response) => {

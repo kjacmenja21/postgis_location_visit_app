@@ -103,8 +103,8 @@ map.on("mouseup", (e) => {
 
 // Function to refresh markers
 function refreshMarkers(map) {
-  let username = document.getElementById("username").value.trim();
-  let password = document.getElementById("password").value.trim();
+  let username = getUsername();
+  let password = getPassword();
 
   // Check if username and password are provided
   if (!username || !password) {
@@ -190,3 +190,10 @@ function refreshMarkers(map) {
 }
 
 refreshMarkers(map);
+function getUsername() {
+  return document.getElementById("username").value.trim();
+}
+
+function getPassword() {
+  return document.getElementById("password").value.trim();
+}
