@@ -150,7 +150,7 @@ CREATE OR REPLACE FUNCTION get_nearby_polygons_by_user(
     lat DOUBLE PRECISION,
     lon DOUBLE PRECISION,
     distance DOUBLE PRECISION,
-    user_id INTEGER
+    usr_id INTEGER
 ) RETURNS SETOF jsonb AS $$
 BEGIN
     RETURN QUERY
@@ -159,7 +159,7 @@ BEGIN
         'points', jsonb_agg(ST_AsGeoJSON(p.geometry)::jsonb)
     )
     FROM locations p
-    WHERE p.user_id = user_id AND ST_DWithin(
+    WHERE p.user_id = usr_id AND ST_DWithin(
         ST_Transform(p.geometry, 3857),
         ST_Transform(ST_SetSRID(ST_Point(lon, lat), 4326), 3857),
         distance
