@@ -222,7 +222,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to generate heatmap data
-CREATE OR REPLACE FUNCTION generate_heatmap_data(user_id INT, distance DOUBLE PRECISION)
+CREATE OR REPLACE FUNCTION generate_heatmap_data(usr_id INT, distance DOUBLE PRECISION)
 RETURNS JSONB AS $$
 DECLARE
     result JSONB;
@@ -233,11 +233,11 @@ BEGIN
             ST_Y(locations.geometry) AS lat,
             (SELECT COUNT(*)
              FROM locations p
-             WHERE p.user_id = user_id
+             WHERE p.user_id = usr_id
                AND ST_DWithin(locations.geometry, p.geometry, distance)
             ) AS intensity
         FROM locations
-        WHERE user_id = user_id
+        WHERE locations.user_id = usr_id
     )
     SELECT jsonb_agg(
         jsonb_build_object(

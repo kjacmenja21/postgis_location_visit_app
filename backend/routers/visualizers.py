@@ -3,36 +3,36 @@ from typing import Any
 import psycopg2
 from fastapi import APIRouter, Depends, HTTPException
 
-from .util import UserCredentials, get_db
+from .util import UserCredentials, get_db, get_user
 
 router = APIRouter()
 
 
+class NearbyPolygons(UserCredentials):
+    lat: float
+    lon: float
+    distance: float
+
+
+class HeatmapData(UserCredentials):
+    distance: float
+
+
 @router.post("/api/nearby_polygons")
 async def get_nearby_polygons(
-    credentials: UserCredentials,
-    lat: float,
-    lon: float,
-    distance: float,
+    body: NearbyPolygons,
     db: psycopg2.extensions.connection = Depends(get_db),
 ) -> dict[str, Any]:
     """Fetch polygons within a defined distance from the specified latitude and longitude"""
+
     cur = db.cursor()
-    user_id = None
     try:
         # Find the user ID by username and password
-        cur.execute(
-            "SELECT get_user_id(%s, %s);", (credentials.username, credentials.password)
-        )
-        user_id = cur.fetchone()[0]
-
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid username or password")
-
+        user_id = get_user(body.username, body.password, cur)
         # Call the PostgreSQL function to get nearby polygons
         cur.execute(
             "SELECT * FROM get_nearby_polygons_by_user(%s, %s, %s, %s);",
-            (lat, lon, distance, user_id),
+            (body.lat, body.lon, body.distance, user_id),
         )
         rows = cur.fetchall()
     except Exception as e:
@@ -47,16 +47,20 @@ async def get_nearby_polygons(
     return {"type": "FeatureCollection", "features": polygons}
 
 
-@router.get("/api/heatmap_data")
+@router.post("/api/heatmap_data")
 async def get_heatmap_data(
-    distance: float,
+    body: HeatmapData,
     db: psycopg2.extensions.connection = Depends(get_db),
 ) -> dict[str, Any]:
     """Fetch heatmap data (clustered points with intensity)"""
     cur = db.cursor()
     try:
         # Call the PostgreSQL function to get heatmap data
-        cur.execute("SELECT generate_heatmap_data(%s);", (distance,))
+        user_id = get_user(body.username, body.password, cur)
+        cur.execute(
+            "SELECT generate_heatmap_data(%s, %s);",
+            (user_id, body.distance),
+        )
         rows = cur.fetchall()
     except Exception as e:
         raise HTTPException(
