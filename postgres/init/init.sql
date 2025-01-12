@@ -234,7 +234,7 @@ BEGIN
             (SELECT COUNT(*)
              FROM locations p
              WHERE p.user_id = usr_id
-               AND ST_DWithin(locations.geometry, p.geometry, distance)
+               AND ST_DWithin(ST_Transform(locations.geometry, 3857), ST_Transform(p.geometry, 3857), distance)
             ) AS intensity
         FROM locations
         WHERE locations.user_id = usr_id
