@@ -255,6 +255,10 @@ function getDateFormat(date) {
 }
 
 function drawTravelPlan(data, map) {
+  if (window.polyline) {
+    window.polyline.removeFrom(map); // Remove the existing polyline from the map
+    window.polyline = null; // Set the reference to null
+  }
   // Parse the data
   const travelPlan = data; // The data is directly an array of objects
   const coord_type = travelPlan.type;
@@ -287,6 +291,7 @@ function drawTravelPlan(data, map) {
   // Add the polyline to the map
   polyline.addTo(map);
 
+  window.polyline = polyline;
   // Add a popup showing details about the travel plan
   polyline.bindPopup(`
       <strong>Travel Plan</strong><br>
@@ -298,3 +303,49 @@ function drawTravelPlan(data, map) {
   // Adjust the map view to fit the polyline bounds
   map.fitBounds(polyline.getBounds());
 }
+// Function to animate the map to the next point when the button is clicked
+function flyToPoints(buttonId) {
+  // Ensure that window.polyline exists and contains coordinates
+  if (!window.polyline || !window.polyline.getLatLngs()) {
+    console.error("No polyline found or polyline has no coordinates.");
+    return;
+  }
+
+  // Extract the coordinates from the polyline
+  const coordinates = window.polyline.getLatLngs();
+
+  // Retrieve the button using the provided ID
+  const button = document.getElementById(buttonId);
+
+  // Track the current index of the destination
+  let currentIndex = parseInt(button.getAttribute("data-current-index") || "0");
+  const totalDestinations = coordinates.length;
+
+  // Check if there are still destinations to visit
+  if (currentIndex < totalDestinations) {
+    // Fly to the current point with animation
+    map.flyTo(coordinates[currentIndex], 10, {
+      // Adjust the zoom level (10) as necessary
+      animate: true,
+      duration: 2, // Duration of the flyTo animation (in seconds)
+    });
+
+    // Update the button text to reflect the current and total destinations
+    button.textContent = `Destination ${
+      currentIndex + 1
+    } / ${totalDestinations}`;
+
+    // Increment the index for the next click
+    button.setAttribute("data-current-index", currentIndex + 1);
+  } else {
+    // If all points have been visited, reset the button
+    button.textContent = "Fly Through Points";
+    button.setAttribute("data-current-index", "0");
+    console.log("All destinations reached.");
+  }
+}
+
+// Add event listener for the button click
+document.getElementById("flyButton").addEventListener("click", function () {
+  flyToPoints("flyButton");
+});
