@@ -96,11 +96,10 @@ body {
   height: 100px;
 }
 
-#resetButton,
-#saveButton {
+.styleButton {
   width: 100%;
   padding: 10px;
-  background-color: #4285f4;
+  background-color: rgb(4, 158, 37);
   color: white;
   font-size: 16px;
   border: none;
@@ -109,9 +108,8 @@ body {
   margin-top: 10px;
 }
 
-#resetButton:hover,
-#saveButton:hover {
-  background-color: #357ae8;
+.styleButton:hover {
+  background-color: rgb(5, 214, 50);
 }
 
 /* Main content area */
