@@ -80,6 +80,7 @@ document.getElementById("resetButton").onclick = function () {
   map.setView([45.815, 15.981], 10); // Reset to initial position
   clearDrawnPolygons();
   clearHeatmap();
+  clearPolyline();
   refreshMarkers(map);
 };
 
@@ -286,7 +287,8 @@ function drawTravelPlan(data, map) {
     color: coord_type === "wishlist" ? "yellow" : "blue", // Set color based on type
     weight: 4, // Thickness of the line
     opacity: 0.8, // Line opacity
-  });
+    className: "bordered-polyline",
+  }).arrowheads({ size: "20px" });
 
   // Add the polyline to the map
   polyline.addTo(map);
@@ -303,14 +305,17 @@ function drawTravelPlan(data, map) {
   // Adjust the map view to fit the polyline bounds
   map.fitBounds(polyline.getBounds());
 }
-// Function to animate the map to the next point when the button is clicked
-function flyToPoints(buttonId) {
-  // Ensure that window.polyline exists and contains coordinates
+
+function clearPolyline() {
   if (!window.polyline || !window.polyline.getLatLngs()) {
     console.error("No polyline found or polyline has no coordinates.");
     return;
   }
-
+}
+// Function to animate the map to the next point when the button is clicked
+function flyToPoints(buttonId) {
+  // Ensure that window.polyline exists and contains coordinates
+  clearPolyline();
   // Extract the coordinates from the polyline
   const coordinates = window.polyline.getLatLngs();
 
