@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="/static/styles.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://unpkg.com/leaflet-arrowheads@1.4.0/src/leaflet-arrowheads.js"></script>
+    <script src="https://unpkg.com/leaflet-geometryutil@0.10.3/src/leaflet.geometryutil.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
   </head>
   <body>
@@ -124,12 +126,14 @@
             <input
               type="date"
               id="startDate"
+              value="2025-01-01"
               placeholder="Enter travel plan start date"
             />
             <label for="endDate">Travel end date:</label>
             <input
               type="date"
               id="endDate"
+              value="2025-12-31"
               placeholder="Enter travel plan end date"
             />
             <label for="planType">Plan type:</label>
