@@ -37,3 +37,11 @@ def get_db():
     finally:
         if conn:
             conn.close()
+
+
+def get_user(username: str, password: str, cur: psycopg2.extensions.cursor) -> int:
+    cur.execute("SELECT get_user_id(%s, %s);", (username, password))
+    user_id: int = cur.fetchone()[0]
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return user_id

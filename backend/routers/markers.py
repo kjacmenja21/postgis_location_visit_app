@@ -2,9 +2,9 @@ from datetime import date
 from typing import Literal, Optional
 
 import psycopg2
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 
-from .util import UserCredentials, get_db
+from .util import UserCredentials, get_db, get_user
 
 router = APIRouter()
 
@@ -18,6 +18,10 @@ class AddMarker(UserCredentials):
     visit_date: Optional[date]
 
 
+class DeleteMarker(UserCredentials):
+    name: str
+
+
 @router.post("/api/add_marker")
 async def add_marker(
     body: AddMarker,
@@ -26,12 +30,7 @@ async def add_marker(
 
     cur = db.cursor()
     try:
-        cur.execute("SELECT get_user_id(%s, %s);", (body.username, body.password))
-        user_id = cur.fetchone()[0]
-
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid username or password")
-
+        user_id = get_user(body.username, body.password, cur)
         cur.execute(
             "SELECT insert_marker(%s, %s, %s, %s, %s, %s, %s)",
             (
@@ -58,19 +57,19 @@ async def add_marker(
 
 @router.delete("/api/remove_marker")
 async def remove_marker(
-    request: Request, db: psycopg2.extensions.connection = Depends(get_db)
+    body: DeleteMarker,
+    db: psycopg2.extensions.connection = Depends(get_db),
 ) -> dict[str, str]:
-    data = await request.json()
-    naziv = data.get("naziv")
 
     # Validate input
-    if not naziv:
+    if not body.name:
         raise HTTPException(status_code=400, detail="Marker name is required")
 
     cur = db.cursor()
     try:
+        user_id = get_user(body.username, body.password, cur)
         # Call the remove_marker_by_name function in the database
-        cur.execute("SELECT remove_marker_by_name(%s)", (naziv,))
+        cur.execute("SELECT remove_marker_by_name(%s,%s)", (user_id, body.name))
         db.commit()
 
     except Exception as e:
@@ -79,4 +78,4 @@ async def remove_marker(
     finally:
         cur.close()
 
-    return {"message": f"Marker '{naziv}' removed successfully"}
+    return {"message": f"Marker '{body.name}' removed successfully"}

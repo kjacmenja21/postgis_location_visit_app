@@ -209,15 +209,15 @@ FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_markers();
 
 -- Function to remove a marker by name
-CREATE OR REPLACE FUNCTION remove_marker_by_name(user_id INT, marker_name TEXT)
+CREATE OR REPLACE FUNCTION remove_marker_by_name(usr_id INT, marker_name TEXT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM locations
-    WHERE user_id = user_id
-      AND name = marker_name;
+    DELETE FROM locations p
+    WHERE p.user_id = usr_id
+      AND p.name = marker_name;
 
     -- Optional: Notify user of success
-    RAISE NOTICE 'Marker with name "%" has been removed for user ID %.', marker_name, user_id;
+    RAISE NOTICE 'Marker with name "%" has been removed for user ID %.', marker_name, usr_id;
 END;
 $$ LANGUAGE plpgsql;
 
