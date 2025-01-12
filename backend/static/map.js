@@ -113,7 +113,7 @@ function refreshMarkers(map) {
     return;
   }
 
-  fetch("/api/lokacije", {
+  fetch("/api/locations", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

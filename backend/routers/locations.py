@@ -8,7 +8,7 @@ from .util import UserCredentials, get_db
 router = APIRouter()
 
 
-@router.post("/api/lokacije", response_model=list[dict[str, Any]])
+@router.post("/api/locations", response_model=list[dict[str, Any]])
 async def get_lokacije(
     credentials: UserCredentials,
     db: psycopg2.extensions.connection = Depends(get_db),
