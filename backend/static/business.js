@@ -307,15 +307,19 @@ function drawTravelPlan(data, map) {
 }
 
 function clearPolyline() {
-  if (!window.polyline || !window.polyline.getLatLngs()) {
-    console.error("No polyline found or polyline has no coordinates.");
-    return;
+  if (window.polyline) {
+    window.polyline.remove();
+    window.polyline = null;
   }
 }
 // Function to animate the map to the next point when the button is clicked
 function flyToPoints(buttonId) {
   // Ensure that window.polyline exists and contains coordinates
   clearPolyline();
+  if (!window.polyline || !window.polyline.getLatLngs()) {
+    console.error("No polyline found or polyline has no coordinates.");
+    return;
+  }
   // Extract the coordinates from the polyline
   const coordinates = window.polyline.getLatLngs();
 
