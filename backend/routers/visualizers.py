@@ -8,7 +8,7 @@ from .util import UserCredentials, get_db
 router = APIRouter()
 
 
-@router.get("/api/nearby_polygons")
+@router.post("/api/nearby_polygons")
 async def get_nearby_polygons(
     credentials: UserCredentials,
     lat: float,
