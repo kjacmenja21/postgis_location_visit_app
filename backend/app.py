@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from routers import locations, markers, visualizers
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 # Allow CORS for frontend requests
 app.add_middleware(
@@ -35,4 +35,4 @@ async def serve_frontend() -> HTMLResponse:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="error")
