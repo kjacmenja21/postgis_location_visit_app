@@ -146,29 +146,23 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION get_nearby_polygons(
+CREATE OR REPLACE FUNCTION get_nearby_polygons_by_user(
     lat DOUBLE PRECISION,
     lon DOUBLE PRECISION,
-    distance DOUBLE PRECISION
-) RETURNS JSONB AS $$
-DECLARE
-    point_geometria geometry;
+    distance DOUBLE PRECISION,
+    user_id INTEGER
+) RETURNS SETOF jsonb AS $$
 BEGIN
-    -- Convert the input point to a projected coordinate system (e.g., EPSG:3857)
-    point_geometria := ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4326), 3857);
-    
-    -- Return the polygons and points within the specified distance
-    RETURN (
-        SELECT jsonb_build_object(
-            'polygon', ST_AsGeoJSON(ST_ConvexHull(ST_Collect(p.geometry)))::jsonb,
-            'points', jsonb_agg(ST_AsGeoJSON(p.geometry)::jsonb)
-        )
-        FROM locations p
-        WHERE ST_DWithin(
-            ST_Transform(p.geometry, 3857), -- Transform stored point to EPSG:3857
-            point_geometria,
-            distance -- distance in meters
-        )
+    RETURN QUERY
+    SELECT jsonb_build_object(
+        'polygon', ST_AsGeoJSON(ST_ConvexHull(ST_Collect(p.geometry)))::jsonb,
+        'points', jsonb_agg(ST_AsGeoJSON(p.geometry)::jsonb)
+    )
+    FROM locations p
+    WHERE p.user_id = user_id AND ST_DWithin(
+        ST_Transform(p.geometry, 3857),
+        ST_Transform(ST_SetSRID(ST_Point(lon, lat), 4326), 3857),
+        distance
     );
 END;
 $$ LANGUAGE plpgsql;
