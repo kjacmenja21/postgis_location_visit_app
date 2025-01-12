@@ -257,3 +257,43 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Function to draw a polyline for a travel plan
+CREATE OR REPLACE FUNCTION generate_travel_plan_polyline(
+    usr_id INT,
+    coord_type_filter TEXT,
+    start_date DATE DEFAULT NULL,
+    end_date DATE DEFAULT NULL
+) RETURNS JSONB AS $$
+DECLARE
+    result JSONB;
+BEGIN
+    -- Create a query to select points based on filters
+    WITH filtered_points AS (
+        SELECT
+            ST_X(locations.geometry) AS lon,
+            ST_Y(locations.geometry) AS lat
+        FROM locations
+        WHERE locations.user_id = usr_id
+          AND locations.coord_type = coord_type_filter::coordinate_type
+          AND (start_date IS NULL OR locations.visit_date >= start_date)
+          AND (end_date IS NULL OR locations.visit_date <= end_date)
+        ORDER BY locations.visit_date
+    )
+    SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', jsonb_build_object(
+            'type', 'LineString',
+            'coordinates', jsonb_agg(jsonb_build_array(lon, lat))
+        ),
+        'properties', jsonb_build_object(
+            'user_id', usr_id,
+            'coord_type', coord_type_filter,
+            'start_date', start_date,
+            'end_date', end_date
+        )
+    ) INTO result
+    FROM filtered_points;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
