@@ -62,7 +62,6 @@ def get_statistics(
     cur = db.cursor()
     try:
         user_id = get_user(body.username, body.password, cur)
-        logger.debug(user_id)
         cur.execute(
             "SELECT * FROM get_user_statistics(%s);",
             (user_id,),

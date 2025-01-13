@@ -34,6 +34,14 @@ async def serve_frontend() -> HTMLResponse:
     return HTMLResponse(content=html_content)
 
 
+@app.get("/statistics", response_class=HTMLResponse)
+async def serve_statistics() -> HTMLResponse:
+    """Serve the statistics HTML file from the static directory"""
+    with open("static/statistics.html", "r", encoding="utf-8") as file:
+        html_content = file.read()
+    return HTMLResponse(content=html_content)
+
+
 if __name__ == "__main__":
     import uvicorn
 

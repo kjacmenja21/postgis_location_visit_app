@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Statistics</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+      }
+
+      /* Sidebar styling */
+      .sidebar {
+        width: 250px;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-right: 1px solid #ddd;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar h2 {
+        margin: 0 0 20px;
+      }
+
+      .sidebar label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+      }
+
+      .sidebar input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .sidebar button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .sidebar button:hover {
+        background-color: #0056b3;
+      }
+
+      /* Main content styling */
+      .content {
+        flex-grow: 1;
+        padding: 20px;
+      }
+
+      .content h2 {
+        margin-top: 0;
+      }
+
+      .statistics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-card h3 {
+        margin: 0 0 10px;
+      }
+
+      .stat-card p {
+        margin: 0;
+        font-size: 1.2em;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2>User Login</h2>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" />
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" />
+      <button onclick="fetchStatistics()">Submit</button>
+    </div>
+    <div class="content">
+      <h2>Statistics</h2>
+      <div class="statistics-grid" id="statistics-grid">
+        <!-- Statistics will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script>
+      function fetchStatistics() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        if (!username || !password) {
+          alert("Please enter both username and password.");
+          return;
+        }
+
+        fetch("/api/statistics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: username, password: password }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch statistics");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            data[0].forEach((d) => displayStatistics(d.statistics));
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Failed to fetch statistics. Please check your credentials.");
+          });
+      }
+
+      function displayStatistics(statistics) {
+        const grid = document.getElementById("statistics-grid");
+        grid.innerHTML = ""; // Clear existing stats
+
+        Object.entries(statistics).forEach(([key, value]) => {
+          const card = document.createElement("div");
+          card.className = "stat-card";
+
+          const title = document.createElement("h3");
+          title.textContent = formatKey(key); // Format the key with capitalized words
+
+          const statValue = document.createElement("p");
+          if (Array.isArray(value) && key === "locations_by_type") {
+            // Special handling for 'locations_by_type'
+            statValue.innerHTML = value
+              .map((item) => {
+                return `<strong>${capitalizeWords(item.coord_type)}</strong>: ${
+                  item.count
+                }`;
+              })
+              .join("<br>");
+          } else {
+            statValue.textContent = Array.isArray(value)
+              ? JSON.stringify(value, null, 2)
+              : value;
+          }
+
+          card.appendChild(title);
+          card.appendChild(statValue);
+          grid.appendChild(card);
+        });
+      }
+
+      function capitalizeWords(str) {
+        return str.replace(/\b\w/g, (char) => char.toUpperCase());
+      }
+
+      function formatKey(key) {
+        return key
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+      }
+    </script>
+  </body>
+</html>
