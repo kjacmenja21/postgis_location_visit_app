@@ -358,24 +358,98 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to get aggregated user statistics
-CREATE OR REPLACE FUNCTION get_user_statistics(usr_id INT)
+-- Create the countries table
+CREATE TABLE countries (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(150) UNIQUE NOT NULL,
+    geometry GEOMETRY(MultiPolygon, 4326) NOT NULL
+);
+
+-- Function to insert GeoJSON data into the countries table
+CREATE OR REPLACE FUNCTION add_country_geojson(
+    country_name TEXT,
+    geojson_data JSONB
+) RETURNS VOID AS $$
+BEGIN
+    INSERT INTO countries (name, geometry)
+    VALUES (
+        country_name,
+        ST_SetSRID(ST_Multi(ST_GeomFromGeoJSON(geojson_data::TEXT)), 4326)
+    )
+    ON CONFLICT (name) DO NOTHING;  -- Avoid duplicate entries for the same country
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to calculate the number of countries visited
+CREATE OR REPLACE FUNCTION get_countries_visited(usr_id INT)
+RETURNS JSONB AS $$
+DECLARE
+    countries_visited INT;
+BEGIN
+    -- Ensure a `countries` table exists with columns `name` (country name) and `geometry` (polygon/geometry of the country)
+    SELECT COUNT(DISTINCT c.name)
+    INTO countries_visited
+    FROM locations l
+    JOIN countries c
+    ON ST_Within(l.geometry, c.geometry)
+    WHERE l.user_id = usr_id;
+
+    RETURN jsonb_build_object(
+        'user_id', usr_id,
+        'countries_visited', countries_visited
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to find the longest single journey between two locations
+CREATE OR REPLACE FUNCTION get_longest_single_journey(usr_id INT)
+RETURNS JSONB AS $$
+DECLARE
+    longest_distance FLOAT;
+BEGIN
+    WITH ordered_points AS (
+        SELECT
+            geometry,
+            LAG(geometry) OVER (ORDER BY visit_date) AS prev_geometry
+        FROM locations p
+        WHERE p.user_id = usr_id
+    )
+    SELECT COALESCE(MAX(ST_DistanceSphere(geometry, prev_geometry)), 0)
+    INTO longest_distance
+    FROM ordered_points
+    WHERE prev_geometry IS NOT NULL;
+
+    RETURN jsonb_build_object(
+        'user_id', usr_id,
+        'longest_single_journey_meters', longest_distance
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Update the get_user_statistics function to include these new statistics
+CREATE OR REPLACE FUNCTION get_user_statistics(user_id INT)
 RETURNS JSONB AS $$
 DECLARE
     total_locations JSONB;
     total_distance JSONB;
     locations_by_type JSONB;
+    countries_visited JSONB;
+    longest_journey JSONB;
 BEGIN
-    total_locations := get_total_locations(usr_id);
-    total_distance := get_total_distance(usr_id);
-    locations_by_type := get_locations_by_type(usr_id);
+    total_locations := get_total_locations(user_id);
+    total_distance := get_total_distance(user_id);
+    locations_by_type := get_locations_by_type(user_id);
+    countries_visited := get_countries_visited(user_id);
+    longest_journey := get_longest_single_journey(user_id);
 
     RETURN jsonb_build_object(
-        'user_id', usr_id,
+        'user_id', user_id,
         'statistics', jsonb_build_object(
             'total_locations', total_locations->'total_locations',
             'total_distance_meters', total_distance->'total_distance_meters',
-            'locations_by_type', locations_by_type
+            'locations_by_type', locations_by_type,
+            'countries_visited', countries_visited->'countries_visited',
+            'longest_single_journey_meters', longest_journey->'longest_single_journey_meters'
         )
     );
 END;
