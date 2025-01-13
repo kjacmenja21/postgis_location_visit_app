@@ -296,4 +296,89 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Function to calculate total number of locations visited
+CREATE OR REPLACE FUNCTION get_total_locations(usr_id INT)
+RETURNS JSONB AS $$
+DECLARE
+    total_locations INT;
+BEGIN
+    SELECT COUNT(*)
+    INTO total_locations
+    FROM locations p
+    WHERE p.user_id = usr_id;
+
+    RETURN jsonb_build_object(
+        'user_id', usr_id,
+        'total_locations', total_locations
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to calculate total distance traveled by a user
+CREATE OR REPLACE FUNCTION get_total_distance(usr_id INT)
+RETURNS JSONB AS $$
+DECLARE
+    total_distance FLOAT;
+BEGIN
+    WITH ordered_points AS (
+        SELECT
+            geometry,
+            LAG(geometry) OVER (ORDER BY visit_date) AS prev_geometry
+        FROM locations p
+        WHERE p.user_id = usr_id
+    )
+    SELECT COALESCE(SUM(ST_DistanceSphere(geometry, prev_geometry)), 0)
+    INTO total_distance
+    FROM ordered_points
+    WHERE prev_geometry IS NOT NULL;
+
+    RETURN jsonb_build_object(
+        'user_id', usr_id,
+        'total_distance_meters', total_distance
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to count locations by coordinate type
+CREATE OR REPLACE FUNCTION get_locations_by_type(usr_id INT)
+RETURNS JSONB AS $$
+BEGIN
+    RETURN jsonb_agg(
+        jsonb_build_object(
+            'coord_type', coord_type,
+            'count', count
+        )
+    )
+    FROM (
+        SELECT coord_type, COUNT(*) AS count
+        FROM locations p
+        WHERE p.user_id = usr_id
+        GROUP BY coord_type
+    ) AS type_counts;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to get aggregated user statistics
+CREATE OR REPLACE FUNCTION get_user_statistics(usr_id INT)
+RETURNS JSONB AS $$
+DECLARE
+    total_locations JSONB;
+    total_distance JSONB;
+    locations_by_type JSONB;
+BEGIN
+    total_locations := get_total_locations(usr_id);
+    total_distance := get_total_distance(usr_id);
+    locations_by_type := get_locations_by_type(usr_id);
+
+    RETURN jsonb_build_object(
+        'user_id', usr_id,
+        'statistics', jsonb_build_object(
+            'total_locations', total_locations->'total_locations',
+            'total_distance_meters', total_distance->'total_distance_meters',
+            'locations_by_type', locations_by_type
+        )
+    );
+END;
+$$ LANGUAGE plpgsql;
+
 

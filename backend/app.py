@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from routers import locations, markers, travel_plan, visualizers
+from routers import locations, markers, statistics, travel_plan, visualizers
 
 app = FastAPI(debug=True)
 
@@ -23,6 +23,7 @@ app.include_router(locations.router)
 app.include_router(markers.router)
 app.include_router(visualizers.router)
 app.include_router(travel_plan.router)
+app.include_router(statistics.router)
 
 
 @app.get("/", response_class=HTMLResponse)
