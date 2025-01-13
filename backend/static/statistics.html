@@ -113,26 +113,36 @@
           alert("Please enter both username and password.");
           return;
         }
-
-        fetch("/api/statistics", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username: username, password: password }),
-        })
+        fetch("/api/get_countries")
           .then((response) => {
             if (!response.ok) {
-              throw new Error("Failed to fetch statistics");
+              throw new Error("Server is not ready. Please try again later.");
             }
-            return response.json();
+            return response.json(); // Proceed if the server is ready
           })
-          .then((data) => {
-            data[0].forEach((d) => displayStatistics(d.statistics));
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            alert("Failed to fetch statistics. Please check your credentials.");
+          .then(() => {
+            fetch("/api/statistics", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ username: username, password: password }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Failed to fetch statistics");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                data[0].forEach((d) => displayStatistics(d.statistics));
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                alert(
+                  "Failed to fetch statistics. Please check your credentials."
+                );
+              });
           });
       }
 
@@ -158,9 +168,7 @@
               })
               .join("<br>");
           } else {
-            statValue.textContent = Array.isArray(value)
-              ? JSON.stringify(value, null, 2)
-              : value;
+            statValue.textContent = formatValue(key, value);
           }
 
           card.appendChild(title);
@@ -177,6 +185,23 @@
         return key
           .replace(/_/g, " ")
           .replace(/\b\w/g, (char) => char.toUpperCase());
+      }
+
+      // Check if the value is a number and convert to kilometers if greater than 999
+      function formatValue(key, value) {
+        if (typeof value === "number") {
+          if (key.includes("meters") && value > 999) {
+            // Convert to kilometers and display with 'km'
+            return (value / 1000).toFixed(2) + " km";
+          } else {
+            return value;
+          }
+        } else if (Array.isArray(value)) {
+          // Handle array values (like locations_by_type)
+          return JSON.stringify(value, null, 2);
+        } else {
+          return value;
+        }
       }
     </script>
   </body>
