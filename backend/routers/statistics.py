@@ -1,4 +1,5 @@
 import json
+import logging
 
 import httpx
 import psycopg2
@@ -6,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from .util import UserCredentials, get_db, get_user
 
+logger = logging.getLogger("uvicorn.error")
 router = APIRouter()
 
 
@@ -19,31 +21,37 @@ async def fetch_and_store_countries(
     COUNTRY_GEOJSON_URL = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
     cur = db.cursor()
 
-    async with httpx.AsyncClient() as session:
-        response: httpx.Response = await session.get(COUNTRY_GEOJSON_URL)
+    try:
+        async with httpx.AsyncClient() as session:
+            response: httpx.Response = await session.get(COUNTRY_GEOJSON_URL)
 
-        if response.status_code != 200:
-            raise HTTPException("Failed to fetch GeoJSON data.")
+            if response.status_code != 200:
+                raise HTTPException("Failed to fetch GeoJSON data.")
 
-        geojson_data: dict = response.json()
+            geojson_data: dict = response.json()
 
-        for feature in geojson_data["features"]:
-            country_name = feature["properties"].get("name")
-            geometry = json.dumps(feature["geometry"])
+            for feature in geojson_data["features"]:
+                country_name = feature["properties"].get("name")
+                geometry = json.dumps(feature["geometry"])
 
-            if country_name and geometry:
-                cur.execute(
-                    """
-                    SELECT add_country_geojson(%s, %s);
-                    """,
-                    (
-                        country_name,
-                        geometry,
-                    ),
-                )
-    cur.execute("""SELECT COUNT(*) FROM countries;""")
-    count = cur.fetchall()[0]
-    return f"Added {count} countries."
+                if country_name and geometry:
+                    cur.execute(
+                        """
+                        SELECT add_country_geojson(%s, %s);
+                        """,
+                        (
+                            country_name,
+                            geometry,
+                        ),
+                    )
+        cur.execute("""SELECT COUNT(*) FROM countries;""")
+        count = cur.fetchone()[0]
+    except Exception as e:
+        raise e
+    finally:
+        db.commit()
+        cur.close()
+    return {"message": f"Added {count} countries."}
 
 
 @router.post("/api/statistics")
@@ -54,6 +62,7 @@ def get_statistics(
     cur = db.cursor()
     try:
         user_id = get_user(body.username, body.password, cur)
+        logger.debug(user_id)
         cur.execute(
             "SELECT * FROM get_user_statistics(%s);",
             (user_id,),

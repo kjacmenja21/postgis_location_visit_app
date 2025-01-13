@@ -382,24 +382,19 @@ $$ LANGUAGE plpgsql;
 
 -- Function to calculate the number of countries visited
 CREATE OR REPLACE FUNCTION get_countries_visited(usr_id INT)
-RETURNS JSONB AS $$
-DECLARE
-    countries_visited INT;
+RETURNS INT AS $$
 BEGIN
-    -- Ensure a `countries` table exists with columns `name` (country name) and `geometry` (polygon/geometry of the country)
-    SELECT COUNT(DISTINCT c.name)
-    INTO countries_visited
-    FROM locations l
-    JOIN countries c
-    ON ST_Within(l.geometry, c.geometry)
-    WHERE l.user_id = usr_id;
-
-    RETURN jsonb_build_object(
-        'user_id', usr_id,
-        'countries_visited', countries_visited
+    RETURN (
+        SELECT COUNT(DISTINCT c.id)
+        FROM locations l
+        JOIN countries c
+        ON ST_Intersects(c.geometry, l.geometry)  -- Use ST_Intersects for better border handling
+        WHERE l.user_id = usr_id
+          AND l.coord_type = 'visited'
     );
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- Function to find the longest single journey between two locations
 CREATE OR REPLACE FUNCTION get_longest_single_journey(usr_id INT)
@@ -448,7 +443,7 @@ BEGIN
             'total_locations', total_locations->'total_locations',
             'total_distance_meters', total_distance->'total_distance_meters',
             'locations_by_type', locations_by_type,
-            'countries_visited', countries_visited->'countries_visited',
+            'countries_visited', countries_visited,
             'longest_single_journey_meters', longest_journey->'longest_single_journey_meters'
         )
     );
