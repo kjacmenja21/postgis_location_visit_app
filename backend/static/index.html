@@ -145,12 +145,21 @@
             <button id="flyButton" class="styleButton">Fly on plan!</button>
           </div>
         </div>
+        <button class="styleButton" onclick="goToStatistics()">
+          My Statistics
+        </button>
       </div>
 
       <div id="main">
         <div id="map"></div>
       </div>
     </div>
+    <script>
+      function goToStatistics() {
+        // This will navigate the user to the /statistics page
+        window.location.href = "/statistics";
+      }
+    </script>
     <script src="/static/map.js"></script>
     <script src="/static/collapsible.js"></script>
     <script src="/static/business.js"></script>
