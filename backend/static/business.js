@@ -315,7 +315,6 @@ function clearPolyline() {
 // Function to animate the map to the next point when the button is clicked
 function flyToPoints(buttonId) {
   // Ensure that window.polyline exists and contains coordinates
-  clearPolyline();
   if (!window.polyline || !window.polyline.getLatLngs()) {
     console.error("No polyline found or polyline has no coordinates.");
     return;
