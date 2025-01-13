@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Any, Generator
 
 import psycopg2
 from fastapi import HTTPException
@@ -12,7 +13,7 @@ class UserCredentials(BaseModel):
 
 
 # Create a function to connect to the PostgreSQL database
-def get_db():
+def get_db() -> Generator[psycopg2.extensions.connection, Any, None]:
     try:
         logging.debug(
             {
